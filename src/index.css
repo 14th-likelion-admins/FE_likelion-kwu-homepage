@@ -32,20 +32,17 @@ body {
 }
 
 /* 전역 스크롤바 스타일 */
+/* Chrome, Safari, Edge */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  display: none;
 }
 
-::-webkit-scrollbar-track {
-  background: #111;
+/* Firefox */
+* {
+  scrollbar-width: none;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #444;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #666;
+/* IE, Edge Legacy */
+* {
+  -ms-overflow-style: none;
 }

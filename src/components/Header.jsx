@@ -2,6 +2,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import logo from '../assets/kw-logo.png'
+import { LINKS } from '../utils/links'
 
 export default function Header() {
   const [showToast, setShowToast] = useState(false)
@@ -22,6 +23,7 @@ export default function Header() {
     setTimeout(() => {
       setShowToast(false)
     }, 3000)
+    window.open(LINKS.FORMLINK)
   }
 
   return (
@@ -80,11 +82,7 @@ export default function Header() {
               }
             }
           `}</style>
-          <p className='text-sm leading-relaxed text-center md:text-base'>
-            지금은 아기사자 지원기간이 아니에요!
-            <br />
-            모집 기간을 확인해주세요 :)
-          </p>
+          <p className='text-sm leading-relaxed text-center md:text-base'>{LINKS.MESSAGE}</p>
         </div>
       )}
     </>
