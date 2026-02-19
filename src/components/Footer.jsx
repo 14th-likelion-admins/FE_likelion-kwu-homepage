@@ -1,6 +1,7 @@
 // src/components/Footer.jsx
 import email from '../assets/email-icon.png'
 import insta from '../assets/insta-icon.png'
+import { LINKS } from '../utils/links'
 
 export default function Footer() {
   return (
@@ -12,14 +13,14 @@ export default function Footer() {
         </p>
 
         <div className='flex items-center gap-6 text-sm text-white md:ml-auto'>
-          <a href='mailto:dofqls0127@gmail.com' className='transition hover:text-orange-400'>
+          <a href={`mailto:${LINKS.EMAIL}`} className='transition hover:text-orange-400'>
             Contact us!
           </a>
-          <a href='mailto:dofqls0127@gmail.com' aria-label='Send email to dofqls0127@gmail.com'>
+          <a href={`mailto:${LINKS.EMAIL}`} aria-label={`Send email to ${LINKS.EMAIL}`}>
             <img src={email} alt='email' className='w-8 md:w-8' />
           </a>
           <a
-            href='https://www.instagram.com/likelion_kwangwoon/'
+            href={LINKS.INSTAGRAM}
             target='_blank'
             rel='noopener noreferrer'
             aria-label='Visit likelion_kwangwoon Instagram'

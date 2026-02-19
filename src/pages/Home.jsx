@@ -11,6 +11,7 @@ import noiseStar from '../assets/noise-star.png'
 import gradiantBg from '../assets/gradiant-bg.png'
 import supportButton from '../assets/support-button.png'
 
+import { LINKS } from '../utils/links'
 import { loadFonts } from '../utils/fonts'
 
 export default function Home() {
@@ -28,6 +29,7 @@ export default function Home() {
     setTimeout(() => {
       setShowToast(false)
     }, 3000)
+    window.open(LINKS.FORMLINK)
   }
 
   const handleViewClick = () => {
@@ -111,11 +113,7 @@ export default function Home() {
               }
             }
           `}</style>
-          <p className='text-sm leading-relaxed text-center md:text-base'>
-            지금은 아기사자 지원기간이 아니에요!
-            <br />
-            모집 기간을 확인해주세요 :)
-          </p>
+          <p className='text-sm leading-relaxed text-center md:text-base'>{LINKS.MESSAGE}</p>
         </div>
       )}
 

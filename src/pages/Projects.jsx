@@ -148,7 +148,10 @@ export default function Projects() {
   const visibleProjects = filteredProjects.slice(0, displayedProjects)
 
   return (
-    <div className='bg-[#1A1A1A] text-white font-sans min-h-screen'>
+    <div
+      className='bg-[#1A1A1A] text-white font-sans min-h-screen'
+      style={{ fontFamily: 'Space Grotesk' }}
+    >
       <Header />
 
       <main className='relative px-4 pt-12 pb-16 mx-auto md:pt-20 md:px-6 lg:px-8 max-w-7xl'>
