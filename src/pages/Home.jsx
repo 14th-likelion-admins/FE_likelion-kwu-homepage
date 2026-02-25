@@ -1,5 +1,6 @@
 // src/pages/Home.jsx
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import Core1 from '../assets/corevalue1.png'
@@ -15,11 +16,12 @@ import { LINKS } from '../utils/links'
 import { loadFonts } from '../utils/fonts'
 
 export default function Home() {
+  const navigate = useNavigate()
   const [aboutVisible, setAboutVisible] = useState(false)
   const [coreValuesVisible, setCoreValuesVisible] = useState(false)
   const [heroAnimated, setHeroAnimated] = useState(false)
   const [showToast, setShowToast] = useState(false)
-  const [viewToast, setViewToast] = useState(false)
+  const [heroHover, setHeroHover] = useState(null)
 
   const aboutRef = useRef(null)
   const coreValuesRef = useRef(null)
@@ -33,10 +35,7 @@ export default function Home() {
   }
 
   const handleViewClick = () => {
-    setViewToast(true)
-    setTimeout(() => {
-      setViewToast(false)
-    }, 3000)
+    navigate('/activities')
   }
 
   useEffect(() => {
@@ -117,31 +116,6 @@ export default function Home() {
         </div>
       )}
 
-      {/* view Toast 알림 */}
-      {viewToast && (
-        <div
-          className='fixed top-24 left-1/2 transform -translate-x-1/2 z-[100] px-4 py-3 md:px-6 md:py-4 bg-gray-800 text-white rounded-lg shadow-2xl border border-gray-600'
-          style={{
-            animation: 'slideDown 0.3s ease-out',
-            maxWidth: '90vw',
-          }}
-        >
-          <style>{`
-            @keyframes slideDown {
-              from {
-                opacity: 0;
-                transform: translate(-50%, -20px);
-              }
-              to {
-                opacity: 1;
-                transform: translate(-50%, 0);
-              }
-            }
-          `}</style>
-          <p className='text-sm text-center md:text-base'>준비 중이에요!</p>
-        </div>
-      )}
-
       <main className='relative min-h-screen'>
         {/* Noise 배경 - 모든 섹션에 적용 */}
         <div
@@ -191,7 +165,12 @@ export default function Home() {
 
               {/* FRONTEND - 버튼 */}
               <button
-                className='absolute hover:text-orange-300'
+                className='absolute z-20'
+                onClick={() => navigate('/curriculum/frontend')}
+                onMouseEnter={() => setHeroHover('frontend')}
+                onMouseLeave={() => setHeroHover(null)}
+                onFocus={() => setHeroHover('frontend')}
+                onBlur={() => setHeroHover(null)}
                 style={{
                   top: '100px',
                   left: heroAnimated ? '38%' : '50%',
@@ -202,8 +181,11 @@ export default function Home() {
                 }}
               >
                 <div
-                  className='text-2xl md:text-3xl font-light tracking-wide hover:font-bold hover:drop-shadow-[0_0_10px_rgba(251,146,60,0.8)]'
-                  style={{ transition: 'font-weight 0.3s, filter 0.3s' }}
+                  className={`text-2xl md:text-3xl font-light tracking-wide transition-[color,font-weight,filter] duration-300 ${
+                    heroHover === 'frontend'
+                      ? 'font-bold text-orange-300 drop-shadow-[0_0_10px_rgba(251,146,60,0.8)]'
+                      : 'text-white'
+                  }`}
                 >
                   FRONTEND
                 </div>
@@ -211,7 +193,12 @@ export default function Home() {
 
               {/* BACKEND - 버튼 */}
               <button
-                className='absolute hover:text-orange-300'
+                className='absolute z-20'
+                onClick={() => navigate('/curriculum/backend')}
+                onMouseEnter={() => setHeroHover('backend')}
+                onMouseLeave={() => setHeroHover(null)}
+                onFocus={() => setHeroHover('backend')}
+                onBlur={() => setHeroHover(null)}
                 style={{
                   top: '180px',
                   left: heroAnimated ? '30%' : '50%',
@@ -222,8 +209,11 @@ export default function Home() {
                 }}
               >
                 <div
-                  className='text-2xl md:text-3xl font-light tracking-wide hover:font-bold hover:drop-shadow-[0_0_10px_rgba(251,146,60,0.8)]'
-                  style={{ transition: 'font-weight 0.3s, filter 0.3s' }}
+                  className={`text-2xl md:text-3xl font-light tracking-wide transition-[color,font-weight,filter] duration-300 ${
+                    heroHover === 'backend'
+                      ? 'font-bold text-orange-300 drop-shadow-[0_0_10px_rgba(251,146,60,0.8)]'
+                      : 'text-white'
+                  }`}
                 >
                   BACKEND
                 </div>
@@ -292,7 +282,12 @@ export default function Home() {
 
               {/* UXUI DESIGN - 버튼 */}
               <button
-                className='absolute hover:text-orange-300'
+                className='absolute z-20'
+                onClick={() => navigate('/curriculum/design')}
+                onMouseEnter={() => setHeroHover('design')}
+                onMouseLeave={() => setHeroHover(null)}
+                onFocus={() => setHeroHover('design')}
+                onBlur={() => setHeroHover(null)}
                 style={{
                   bottom: '250px',
                   left: heroAnimated ? '38%' : '50%',
@@ -303,8 +298,11 @@ export default function Home() {
                 }}
               >
                 <div
-                  className='text-2xl md:text-3xl font-light tracking-wide hover:font-bold hover:drop-shadow-[0_0_10px_rgba(251,146,60,0.8)]'
-                  style={{ transition: 'font-weight 0.3s, filter 0.3s' }}
+                  className={`text-2xl md:text-3xl font-light tracking-wide transition-[color,font-weight,filter] duration-300 ${
+                    heroHover === 'design'
+                      ? 'font-bold text-orange-300 drop-shadow-[0_0_10px_rgba(251,146,60,0.8)]'
+                      : 'text-white'
+                  }`}
                 >
                   UXUI DESIGN
                 </div>
