@@ -25,6 +25,15 @@ export default function Curriculum() {
 
     let rafId = null
     const updateActiveStep = () => {
+      const scrollBottom = window.scrollY + window.innerHeight
+      const documentHeight = document.documentElement.scrollHeight
+      const isAtPageBottom = scrollBottom >= documentHeight - 2
+      if (isAtPageBottom) {
+        const lastIndex = elements.length - 1
+        setActiveStep((prev) => (prev === lastIndex ? prev : lastIndex))
+        return
+      }
+
       const viewportCenter = window.innerHeight * 0.45
       let next = 0
       let minDistance = Number.POSITIVE_INFINITY
