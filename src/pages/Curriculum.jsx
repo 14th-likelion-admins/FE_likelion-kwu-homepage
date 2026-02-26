@@ -20,35 +20,46 @@ export default function Curriculum() {
   }, [])
 
   useEffect(() => {
-    setActiveStep(0)
-    itemRefs.current = []
-  }, [safeTrack])
-
-  useEffect(() => {
     const elements = itemRefs.current.filter(Boolean)
     if (!elements.length) return undefined
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        let next = activeStep
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const idx = Number(entry.target.getAttribute('data-step-index'))
-            if (!Number.isNaN(idx)) next = idx
-          }
-        })
-        setActiveStep(next)
-      },
-      {
-        root: null,
-        threshold: 0.45,
-        rootMargin: '-20% 0px -45% 0px',
-      },
-    )
+    let rafId = null
+    const updateActiveStep = () => {
+      const viewportCenter = window.innerHeight * 0.45
+      let next = 0
+      let minDistance = Number.POSITIVE_INFINITY
 
-    elements.forEach((el) => observer.observe(el))
-    return () => observer.disconnect()
-  }, [safeTrack, activeStep])
+      elements.forEach((el, idx) => {
+        const rect = el.getBoundingClientRect()
+        const elementCenter = rect.top + rect.height / 2
+        const distance = Math.abs(elementCenter - viewportCenter)
+        if (distance < minDistance) {
+          minDistance = distance
+          next = idx
+        }
+      })
+
+      setActiveStep((prev) => (prev === next ? prev : next))
+    }
+
+    const onScrollOrResize = () => {
+      if (rafId !== null) return
+      rafId = window.requestAnimationFrame(() => {
+        updateActiveStep()
+        rafId = null
+      })
+    }
+
+    updateActiveStep()
+    window.addEventListener('scroll', onScrollOrResize, { passive: true })
+    window.addEventListener('resize', onScrollOrResize)
+
+    return () => {
+      window.removeEventListener('scroll', onScrollOrResize)
+      window.removeEventListener('resize', onScrollOrResize)
+      if (rafId !== null) window.cancelAnimationFrame(rafId)
+    }
+  }, [safeTrack, current.items.length])
 
   return (
     <div
