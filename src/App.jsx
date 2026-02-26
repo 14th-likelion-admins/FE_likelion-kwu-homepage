@@ -1,5 +1,6 @@
 // src/App.jsx
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
 import Recruit from './pages/Recruit'
 import Curriculum from './pages/Curriculum'
@@ -7,9 +8,20 @@ import Activities from './pages/Activities'
 import Projects from './pages/Projects'
 import ProjectsHome from './pages/ProjectsHome'
 
+function ScrollToTop() {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+
+  return null
+}
+
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         {/* 메인 페이지 */}
         <Route path='/' element={<Home />} />
