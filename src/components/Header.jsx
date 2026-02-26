@@ -41,9 +41,9 @@ export default function Header() {
         className='fixed top-0 left-0 z-50 w-full backdrop-blur'
         style={{ backgroundColor: '#1A1A1A' }}
       >
-        <div className='mx-auto flex max-w-7xl items-center justify-between px-4 py-2.5 md:py-4'>
+        <div className='mx-auto flex max-w-7xl items-center justify-between px-4 py-1.5 md:py-2.5'>
           <Link to='/' className='flex items-center gap-2'>
-            <img src={logo} alt='LIKELION Logo' className='h-7 w-7 md:h-10 md:w-10' />
+            <img src={logo} alt='LIKELION Logo' className='h-6 w-6 md:h-8 md:w-8' />
             <span className='hidden text-lg font-bold md:inline-block md:text-xl'>광운대 멋쟁이사자처럼</span>
           </Link>
 
