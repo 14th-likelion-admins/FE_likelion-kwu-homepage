@@ -25,6 +25,8 @@ import { useEffect, useRef } from 'react'
 export const ProjectDetailModal = ({ project, isOpen, onClose }) => {
   const modalRef = useRef(null)
   const scrollPositionRef = useRef(0)
+  const didPushModalHistoryRef = useRef(false)
+  const closedByPopStateRef = useRef(false)
 
   // 스크롤 관리 - isOpen 변경 시마다 실행
   useEffect(() => {
@@ -85,6 +87,39 @@ export const ProjectDetailModal = ({ project, isOpen, onClose }) => {
     }
   }, [isOpen, onClose])
 
+  // 모바일: 뒤로가기를 누르면 페이지 이동 대신 모달만 닫히도록 히스토리 엔트리 추가
+  useEffect(() => {
+    if (!isOpen) return
+    if (!window.matchMedia('(max-width: 767px)').matches) return
+
+    closedByPopStateRef.current = false
+    window.history.pushState({ ...window.history.state, __projectModal: true }, '')
+    didPushModalHistoryRef.current = true
+
+    const handlePopState = () => {
+      closedByPopStateRef.current = true
+      onClose()
+    }
+
+    window.addEventListener('popstate', handlePopState)
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [isOpen, onClose])
+
+  // 뒤로가기로 닫힌 경우가 아니면, 모달이 push한 히스토리 엔트리를 정리
+  useEffect(() => {
+    if (isOpen) return
+    if (!didPushModalHistoryRef.current) return
+
+    if (!closedByPopStateRef.current) {
+      window.history.back()
+    }
+
+    didPushModalHistoryRef.current = false
+    closedByPopStateRef.current = false
+  }, [isOpen])
+
   // 모달이 닫혀있거나 프로젝트 데이터가 없으면 렌더링하지 않음
   if (!isOpen || !project || !project.detail) return null
 
@@ -136,6 +171,20 @@ export const ProjectDetailModal = ({ project, isOpen, onClose }) => {
                 display: 'block',
               }}
             >
+              <button
+                type='button'
+                onClick={onClose}
+                aria-label='닫기'
+                className='absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/35 text-white md:hidden'
+                style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontSize: '22px',
+                  fontWeight: 200,
+                  lineHeight: 1,
+                }}
+              >
+                x
+              </button>
               <img
                 src={project.detail.thumbnail}
                 alt={project.title}
