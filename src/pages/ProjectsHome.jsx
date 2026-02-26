@@ -238,7 +238,7 @@ export default function ProjectsHome() {
       <main className='relative h-full pt-20' style={{ height: 'calc(100vh - 80px)' }}>
         {/* 배경 이미지 */}
         <div
-          className='fixed bg-center bg-no-repeat'
+          className='fixed pointer-events-none bg-center bg-no-repeat'
           style={{
             backgroundImage: `url(${bkImage1})`,
             backgroundSize: '100% auto',
@@ -254,7 +254,7 @@ export default function ProjectsHome() {
 
         {/* 배경 노이즈 텍스처 */}
         <div
-          className='fixed opacity-30 mix-blend-overlay'
+          className='fixed pointer-events-none opacity-30 mix-blend-overlay'
           style={{
             backgroundImage: `url(${noiseTexture})`,
             backgroundRepeat: 'repeat',
@@ -552,7 +552,9 @@ export default function ProjectsHome() {
         </div>
       </main>
 
-      <Footer />
+      <div className='relative z-20'>
+        <Footer />
+      </div>
 
       {/* 프로젝트 상세 모달 */}
       <ProjectDetailModal
