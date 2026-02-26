@@ -43,7 +43,7 @@ export default function Activities() {
 
   return (
     <div
-      className='relative flex min-h-screen flex-col overflow-x-hidden text-white'
+      className='relative flex min-h-screen flex-col overflow-x-hidden text-white lg:h-screen lg:overflow-hidden'
       style={{ backgroundColor: '#111315', fontFamily: 'Space Grotesk' }}
     >
       <div
@@ -58,7 +58,7 @@ export default function Activities() {
 
       <Header />
 
-      <main className='relative z-10 flex-1 overflow-x-hidden px-4 pb-8 pt-28 md:px-6 md:pt-36'>
+      <main className='relative z-10 flex-1 overflow-x-hidden px-4 pb-8 pt-28 md:px-6 md:pt-36 lg:pb-2 lg:pt-20'>
         <section className='relative mx-auto max-w-[1360px] overflow-x-hidden'>
           <img
             src={dottedCircle}
@@ -70,7 +70,7 @@ export default function Activities() {
             광운대 멋쟁이사자처럼 활동을 소개합니다
           </h1>
 
-          <div className='mt-10 grid grid-cols-1 gap-[30px] sm:grid-cols-2 sm:gap-5 lg:mt-14 lg:grid-cols-4 lg:gap-0.5'>
+          <div className='mt-10 grid grid-cols-1 gap-[30px] sm:grid-cols-2 sm:gap-5 lg:mt-8 lg:grid-cols-4 lg:gap-0.5'>
             {activityCards.map((card) => (
               <article
                 key={card.id}
@@ -83,7 +83,7 @@ export default function Activities() {
                     className='w-full object-contain sm:w-[85%]'
                   />
                 </div>
-                <div className='flex-1 sm:mt-auto sm:w-full sm:flex-none'>
+                <div className='flex-1 sm:mt-auto sm:w-full sm:flex-none sm:-translate-y-[50px]'>
                   <h2 className='text-left text-[18px] font-normal leading-[1.1] sm:flex sm:h-[76px] sm:items-end sm:justify-center sm:text-center sm:text-[26px] sm:font-semibold lg:text-[24px]'>
                     {card.title}
                   </h2>
