@@ -20,13 +20,45 @@
  * ============================================================================
  */
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import ImageCarousel from './ImageCarousel'
+import { getProjectDetail } from '../api/projectApi'
+import { mergeBackendDetail } from '../data/mergeProjects'
 
 export const ProjectDetailModal = ({ project, isOpen, onClose }) => {
   const modalRef = useRef(null)
   const scrollPositionRef = useRef(0)
   const didPushModalHistoryRef = useRef(false)
   const closedByPopStateRef = useRef(false)
+  // 백엔드 프로젝트는 목록에 상세 정보(overview/features/images)가 없을 수 있어,
+  // 모달이 열릴 때 상세 API를 조회해서 backendId별로 캐시합니다.
+  const [detailCache, setDetailCache] = useState({})
+  const [detailErrors, setDetailErrors] = useState({})
+
+  useEffect(() => {
+    if (!isOpen || !project || project.detail) return
+    if (project.source !== 'backend' || project.backendId == null) return
+    if (detailCache[project.backendId] || detailErrors[project.backendId]) return
+
+    let cancelled = false
+    getProjectDetail(project.backendId)
+      .then((detailRes) => {
+        if (cancelled) return
+        setDetailCache((prev) => ({
+          ...prev,
+          [project.backendId]: mergeBackendDetail(project, detailRes),
+        }))
+      })
+      .catch((err) => {
+        console.error('프로젝트 상세 정보를 불러오지 못했습니다.', err)
+        if (!cancelled) {
+          setDetailErrors((prev) => ({ ...prev, [project.backendId]: true }))
+        }
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [isOpen, project, detailCache, detailErrors])
 
   // 스크롤 관리 - isOpen 변경 시마다 실행
   useEffect(() => {
@@ -121,7 +153,14 @@ export const ProjectDetailModal = ({ project, isOpen, onClose }) => {
   }, [isOpen])
 
   // 모달이 닫혀있거나 프로젝트 데이터가 없으면 렌더링하지 않음
-  if (!isOpen || !project || !project.detail) return null
+  if (!isOpen || !project) return null
+
+  // 이미 상세 정보(detail)를 가진 프로젝트(정적 프로젝트 등)는 즉시 표시,
+  // 백엔드 프로젝트는 캐시에 상세 정보가 채워지면 표시
+  const backendDetail = project.backendId != null ? detailCache[project.backendId] : null
+  const hasBackendError = project.backendId != null && detailErrors[project.backendId]
+  const displayProject = project.detail ? project : backendDetail || null
+  const isLoadingDetail = !displayProject && !hasBackendError
 
   return (
     <>
@@ -185,79 +224,114 @@ export const ProjectDetailModal = ({ project, isOpen, onClose }) => {
               >
                 x
               </button>
-              <img
-                src={project.detail.thumbnail}
-                alt={project.title}
-                className='w-full'
-                style={{
-                  display: 'block',
-                  margin: 0,
-                  padding: 0,
-                  verticalAlign: 'top',
-                  width: '100%',
-                  height: 'auto',
-                  objectFit: 'contain',
-                  objectPosition: 'top',
-                }}
-              />
+              {displayProject && (
+                <ImageCarousel
+                  images={
+                    displayProject.detail.images?.length
+                      ? displayProject.detail.images
+                      : [displayProject.detail.thumbnail]
+                  }
+                  alt={displayProject.title}
+                />
+              )}
             </div>
 
             {/* 프로젝트 설명 */}
             <div className='px-6 pt-0 pb-6 md:px-8 md:pb-8'>
-              {/* 프로젝트 개요 */}
-              <div className='mb-8'>
-                <h3
-                  className='mb-4 text-xl font-bold text-gray-900'
-                  style={{
-                    fontFamily: "'Inter', sans-serif",
-                  }}
-                >
-                  📍 프로젝트 개요
-                </h3>
+              {!displayProject ? (
                 <div
-                  className='leading-relaxed text-gray-700 whitespace-pre-line'
-                  style={{
-                    fontFamily: "'Inter', sans-serif",
-                    fontSize: '16px',
-                    lineHeight: '1.8',
-                  }}
+                  className='py-12 text-center text-gray-500'
+                  style={{ fontFamily: "'Inter', sans-serif" }}
                 >
-                  {project.detail.overview.split(/\*\*(.*?)\*\*/g).map((text, index) => {
-                    if (index % 2 === 1) {
-                      return <strong key={index}>{text}</strong>
-                    }
-                    return <span key={index}>{text}</span>
-                  })}
+                  {isLoadingDetail ? '불러오는 중...' : '프로젝트 정보를 불러오지 못했습니다.'}
                 </div>
-              </div>
-
-              {/* 주요 기능 */}
-              <div className='mb-8'>
-                <h3
-                  className='mb-4 text-xl font-bold text-gray-900'
-                  style={{
-                    fontFamily: "'Inter', sans-serif",
-                  }}
-                >
-                  📍 주요 기능
-                </h3>
-                <ul className='space-y-2 list-none'>
-                  {project.detail.features.map((feature, index) => (
-                    <li
-                      key={index}
-                      className='flex items-start text-gray-700'
+              ) : (
+                <>
+                  {/* 프로젝트 개요 */}
+                  <div className='mb-8'>
+                    {/* 기수 / 활동 종류 배지 */}
+                    {(displayProject.generation || displayProject.activity) && (
+                      <div className='flex flex-wrap items-center gap-2 mb-4'>
+                        {displayProject.generation && displayProject.generation !== '미지정' && (
+                          <span
+                            className='inline-flex items-center rounded-full border border-gray-300 bg-gray-50 px-3 py-1 text-gray-700'
+                            style={{
+                              fontFamily: "'Inter', sans-serif",
+                              fontSize: '12px',
+                              fontWeight: 500,
+                            }}
+                          >
+                            {displayProject.generation}
+                          </span>
+                        )}
+                        {displayProject.activity && displayProject.activity !== '미지정' && (
+                          <span
+                            className='inline-flex items-center rounded-full border border-orange-300 bg-orange-50 px-3 py-1 text-orange-600'
+                            style={{
+                              fontFamily: "'Inter', sans-serif",
+                              fontSize: '12px',
+                              fontWeight: 500,
+                            }}
+                          >
+                            {displayProject.activity}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                    <h3
+                      className='mb-4 text-xl font-bold text-gray-900'
+                      style={{
+                        fontFamily: "'Inter', sans-serif",
+                      }}
+                    >
+                      📍 프로젝트 개요
+                    </h3>
+                    <div
+                      className='leading-relaxed text-gray-700 whitespace-pre-line'
                       style={{
                         fontFamily: "'Inter', sans-serif",
                         fontSize: '16px',
                         lineHeight: '1.8',
                       }}
                     >
-                      <span className='mr-2'>-</span>
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                      {displayProject.detail.overview.split(/\*\*(.*?)\*\*/g).map((text, index) => {
+                        if (index % 2 === 1) {
+                          return <strong key={index}>{text}</strong>
+                        }
+                        return <span key={index}>{text}</span>
+                      })}
+                    </div>
+                  </div>
+
+                  {/* 주요 기능 */}
+                  <div className='mb-8'>
+                    <h3
+                      className='mb-4 text-xl font-bold text-gray-900'
+                      style={{
+                        fontFamily: "'Inter', sans-serif",
+                      }}
+                    >
+                      📍 주요 기능
+                    </h3>
+                    <ul className='space-y-2 list-none'>
+                      {displayProject.detail.features.map((feature, index) => (
+                        <li
+                          key={index}
+                          className='flex items-start text-gray-700'
+                          style={{
+                            fontFamily: "'Inter', sans-serif",
+                            fontSize: '16px',
+                            lineHeight: '1.8',
+                          }}
+                        >
+                          <span className='mr-2'>-</span>
+                          <span>{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         </div>

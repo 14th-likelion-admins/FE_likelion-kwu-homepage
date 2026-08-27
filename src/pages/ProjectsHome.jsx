@@ -5,7 +5,7 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import bkImage1 from '../assets/bk-image-1.png'
 import noiseTexture from '../assets/noise-texture.png'
-import { getAllProjects, getLatestProjects } from '../data/projectsData'
+import useProjects from '../hooks/useProjects'
 import ProjectDetailModal from '../components/ProjectDetailModal'
 
 /**
@@ -111,8 +111,8 @@ export default function ProjectsHome() {
   // 각 프로젝트의 썸네일 이미지를 사용하며, 썸네일이 없으면 메인 이미지를 사용합니다.
   // 전체 프로젝트 데이터를 한 번만 가져와서 재사용합니다.
   // ============================================================================
-  const allProjects = getAllProjects()
-  const latestProjects = getLatestProjects(5)
+  const { allProjects } = useProjects()
+  const latestProjects = allProjects.slice(0, 5)
   const projects = latestProjects.map((project) => ({
     id: project.id,
     image: project.thumbnail || project.image, // 썸네일 이미지 우선 사용, 없으면 메인 이미지 fallback
@@ -437,7 +437,7 @@ export default function ProjectsHome() {
                         key={project.id}
                         onClick={() => {
                           if (dragMovedRef.current) return
-                          if (fullProject && fullProject.detail) {
+                          if (fullProject) {
                             setSelectedProject(fullProject)
                             setIsModalOpen(true)
                           }
@@ -476,11 +476,17 @@ export default function ProjectsHome() {
                             top: `${26 * scale}px`, // 상단 여백 26px
                           }}
                         >
-                          <img
-                            src={project.image}
-                            alt={project.title}
-                            className='object-cover w-full h-full'
-                          />
+                          {project.image ? (
+                            <img
+                              src={project.image}
+                              alt={project.title}
+                              className='object-cover w-full h-full'
+                            />
+                          ) : (
+                            <div className='flex items-center justify-center w-full h-full text-xs text-white/30'>
+                              이미지 없음
+                            </div>
+                          )}
                         </div>
 
                         {/* 프로젝트 제목 */}

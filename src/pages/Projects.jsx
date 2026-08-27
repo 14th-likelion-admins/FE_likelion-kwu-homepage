@@ -26,7 +26,8 @@ import { Link, useSearchParams } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import ProjectDetailModal from '../components/ProjectDetailModal'
-import { getAllProjects } from '../data/projectsData'
+import ProjectFormModal from '../components/ProjectFormModal'
+import useProjects from '../hooks/useProjects'
 
 export default function Projects() {
   const [selectedGeneration, setSelectedGeneration] = useState('기수')
@@ -36,14 +37,20 @@ export default function Projects() {
   const observerTarget = useRef(null)
   const [selectedProject, setSelectedProject] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isFormOpen, setIsFormOpen] = useState(false)
 
   const [searchParams] = useSearchParams()
   const projectIdParam = searchParams.get('id')
 
-  const generations = ['전체', '13TH', '12TH']
+  // 프로젝트 데이터 (정적 17개 + 백엔드 등록 프로젝트 병합)
+  const { allProjects, refetch: refetchProjects } = useProjects()
 
-  // 프로젝트 데이터
-  const allProjects = getAllProjects()
+  // 기수 목록은 실제 프로젝트 데이터에서 동적으로 추출 (최신 기수가 먼저)
+  const generations = useMemo(() => {
+    const unique = Array.from(new Set(allProjects.map((p) => p.generation).filter(Boolean)))
+    unique.sort((a, b) => (parseInt(b, 10) || 0) - (parseInt(a, 10) || 0))
+    return ['전체', ...unique]
+  }, [allProjects])
 
   // 화면 너비에 따른 열 개수 계산
   const getColumns = () => {
@@ -250,6 +257,20 @@ export default function Projects() {
           </div>
 
           {/* 활동 드롭다운 (삭제됨) */}
+
+          {/* 프로젝트 등록 버튼 */}
+          <button
+            type='button'
+            onClick={() => setIsFormOpen(true)}
+            className='border border-white rounded-full px-4 py-2 flex items-center justify-center gap-2 bg-[#1A1A1A] hover:bg-white/10 transition-colors'
+            style={{
+              fontFamily: "'Space Grotesk', Helvetica, sans-serif",
+              fontSize: 'clamp(12px, 1vw, 16px)',
+              fontWeight: 300,
+            }}
+          >
+            + 프로젝트 등록
+          </button>
         </div>
 
         {/* 프로젝트 그리드 */}
@@ -284,11 +305,17 @@ export default function Projects() {
                     aspectRatio: '375 / 211',
                   }}
                 >
-                  <img
-                    src={project.image}
-                    alt={project.title}
-                    className='object-cover w-full h-full'
-                  />
+                  {project.image ? (
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      className='object-cover w-full h-full'
+                    />
+                  ) : (
+                    <div className='flex items-center justify-center w-full h-full text-sm text-white/30'>
+                      이미지 없음
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -369,6 +396,13 @@ export default function Projects() {
           setIsModalOpen(false)
           setSelectedProject(null)
         }}
+      />
+
+      {/* 프로젝트 등록 모달 */}
+      <ProjectFormModal
+        isOpen={isFormOpen}
+        onClose={() => setIsFormOpen(false)}
+        onCreated={refetchProjects}
       />
       <Footer />
     </div>
