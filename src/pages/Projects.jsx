@@ -42,8 +42,8 @@ export default function Projects() {
   const [searchParams] = useSearchParams()
   const projectIdParam = searchParams.get('id')
 
-  // 프로젝트 데이터 (정적 17개 + 백엔드 등록 프로젝트 병합)
-  const { allProjects, refetch: refetchProjects } = useProjects()
+  // 프로젝트 데이터 (정적 17개 + 등록된 프로젝트 병합)
+  const { allProjects, addProject } = useProjects()
 
   // 기수 목록은 실제 프로젝트 데이터에서 동적으로 추출 (최신 기수가 먼저)
   const generations = useMemo(() => {
@@ -402,7 +402,7 @@ export default function Projects() {
       <ProjectFormModal
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
-        onCreated={refetchProjects}
+        onCreated={addProject}
       />
       <Footer />
     </div>

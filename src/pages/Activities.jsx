@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
@@ -43,31 +43,22 @@ export default function Activities() {
   const navigate = useNavigate()
   const [selectedActivity, setSelectedActivity] = useState('hackathon')
   const [selectedGeneration, setSelectedGeneration] = useState(14)
-  const [magazine, setMagazine] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
   const [isEditorOpen, setIsEditorOpen] = useState(false)
-  const [refreshKey, setRefreshKey] = useState(0)
+  const [savedNotice, setSavedNotice] = useState('')
 
   useEffect(() => { loadFonts() }, [])
-  useEffect(() => {
-    let active = true
-    getMagazine(ACTIVITY_TYPES[selectedActivity], selectedGeneration)
-      .then((data) => { if (active) setMagazine(data || null) })
-      .catch((requestError) => { if (active) setError(requestError.message || '매거진을 불러오지 못했습니다.') })
-      .finally(() => { if (active) setLoading(false) })
-    return () => { active = false }
-  }, [selectedActivity, selectedGeneration, refreshKey])
+
+  // magazines.json은 빌드에 함께 커밋된 정적 데이터이므로 동기적으로 조회한다.
+  const magazine = useMemo(
+    () => getMagazine(ACTIVITY_TYPES[selectedActivity], selectedGeneration),
+    [selectedActivity, selectedGeneration],
+  )
 
   const selectCard = (cardId) => {
     if (cardId === 'project') { navigate('/projectshome'); return }
-    setLoading(true); setError(''); setMagazine(null)
-    if (cardId === selectedActivity && selectedGeneration === 14) setRefreshKey((current) => current + 1)
     setSelectedActivity(cardId); setSelectedGeneration(14)
   }
   const selectGeneration = (generation) => {
-    setLoading(true); setError(''); setMagazine(null)
-    if (generation === selectedGeneration) setRefreshKey((current) => current + 1)
     setSelectedGeneration(generation)
   }
   const handleCardKeyDown = (event, cardId) => {
@@ -76,8 +67,9 @@ export default function Activities() {
   const handleSaved = ({ activityType, generation }) => {
     const activityId = Object.entries(ACTIVITY_TYPES).find(([, type]) => type === activityType)?.[0]
     if (activityId) setSelectedActivity(activityId)
-    setLoading(true); setError(''); setMagazine(null)
-    setSelectedGeneration(generation); setIsEditorOpen(false); setRefreshKey((current) => current + 1)
+    setSelectedGeneration(generation)
+    setIsEditorOpen(false)
+    setSavedNotice('저장되었습니다. 배포가 반영되기까지 1분 정도 걸릴 수 있습니다.')
   }
 
   return <div className='relative flex min-h-screen flex-col overflow-x-hidden text-white' style={{ backgroundColor: '#111315', fontFamily: 'Space Grotesk' }}>
@@ -103,10 +95,9 @@ export default function Activities() {
             return <button key={generation} type='button' onClick={() => selectGeneration(generation)} className={`inline-flex h-10 min-w-12 items-center justify-center rounded-full border px-4 text-sm font-semibold transition ${active ? 'border-orange-300 bg-white text-orange-500 shadow-[0_0_16px_rgba(255,153,102,0.35)]' : 'border-white/35 bg-transparent text-white hover:border-white/70'}`}>{generation}th</button>
           })}</div><button type='button' onClick={() => setIsEditorOpen(true)} className='inline-flex h-10 items-center gap-1 rounded-full border border-orange-300 bg-white px-4 text-sm font-semibold text-orange-500 transition hover:bg-orange-50' aria-label='매거진 등록'>+ 등록</button></div>
           <div className='mt-5 border-t border-white/25' />
-          {loading && <div className='flex min-h-48 items-center justify-center gap-3 text-white/75'><span className='h-6 w-6 animate-spin rounded-full border-2 border-white/25 border-t-orange-300' />매거진을 불러오는 중입니다.</div>}
-          {!loading && error && <div role='alert' className='py-10 text-center text-red-200'>매거진을 불러오지 못했습니다. {error}</div>}
-          {!loading && !error && !magazine && <div className='py-12 text-center text-white/65'>등록된 매거진이 없습니다.</div>}
-          {!loading && !error && magazine && <MagazineContent magazine={magazine} />}
+          {savedNotice && <div role='status' className='mt-5 rounded-lg border border-orange-300/60 bg-orange-300/10 px-4 py-3 text-sm text-orange-200'>{savedNotice}</div>}
+          {!magazine && <div className='py-12 text-center text-white/65'>등록된 매거진이 없습니다.</div>}
+          {magazine && <MagazineContent magazine={magazine} />}
         </section>
       </section>
     </main>

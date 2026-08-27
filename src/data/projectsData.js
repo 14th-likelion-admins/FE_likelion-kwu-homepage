@@ -13,6 +13,7 @@
  */
 
 import { projectImages, getProjectImage, getThumbnailImageSync } from './projectImages'
+import registeredProjects from './registeredProjects.json'
 
 /**
  * 모든 프로젝트 데이터를 생성하는 함수
@@ -41,7 +42,7 @@ export const clearProjectsCache = () => {
   cachedProjects = null
 }
 
-export const getAllProjects = () => {
+const getStaticProjects = () => {
   // 캐시된 프로젝트가 있으면 재사용 (일관성 보장)
   // 개발 중에는 캐시를 주석 처리하여 항상 최신 데이터를 가져올 수 있습니다.
   if (cachedProjects) {
@@ -654,6 +655,12 @@ SafeScan은 이러한 문제를 해결하기 위해 공공데이터 API를 활�
 
   return projects
 }
+
+/**
+ * 등록된 프로젝트(registeredProjects.json, 이미 화면 표시 shape이며 등록 순 = 최신순) +
+ * 정적 17개(id 내림차순)를 이 순서로 합쳐서 반환한다.
+ */
+export const getAllProjects = () => [...registeredProjects, ...getStaticProjects()]
 
 /**
  * 최신 프로젝트 N개를 가져오는 함수
