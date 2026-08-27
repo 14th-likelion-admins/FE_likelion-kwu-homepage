@@ -1,4 +1,3 @@
-import path from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { Buffer } from 'node:buffer';
 import { putFile } from './_lib/github.js';
@@ -69,8 +68,9 @@ export default async function handler(request, response) {
       return sendJson(response, 400, { success: false, message: '이미지 파일은 5MB 이하여야 합니다.' });
     }
 
-    const originalExtension = path.extname(file.filename).slice(1).toLowerCase();
-    const extension = /^[a-z0-9]{1,8}$/.test(originalExtension) ? originalExtension : MIME_EXTENSIONS[file.mimeType];
+    // 확장자는 클라이언트가 보낸 파일명이 아니라 이미 검증된 mimeType에서만 결정한다.
+    // (파일명은 위조 가능해서 그대로 쓰면 .html 등으로 저장되어 저장형 XSS 벡터가 될 수 있음)
+    const extension = MIME_EXTENSIONS[file.mimeType];
     const filename = `${randomUUID()}.${extension}`;
     await putFile(`public/uploads/${fields.folder}/${filename}`, file.value, `chore(content): upload image ${filename}`);
 

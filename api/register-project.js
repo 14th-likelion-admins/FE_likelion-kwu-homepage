@@ -2,12 +2,20 @@ import { getFile, putFile } from './_lib/github.js';
 import { Buffer } from 'node:buffer';
 import { readJsonBody, requireMethod, requirePassphrase, sendJson } from './_lib/request.js';
 
+const REQUIRED_TEXT_FIELDS = ['title', 'tag', 'description', 'generation', 'activity', 'overview'];
+
 export default async function handler(request, response) {
   if (!requireMethod(request, response, 'POST')) return;
 
   try {
-    const { passphrase, title, tag, description, generation, activity, overview, features, images } = await readJsonBody(request);
+    const body = await readJsonBody(request);
+    const { passphrase, title, tag, description, generation, activity, overview, features, images } = body;
     if (!requirePassphrase(response, passphrase)) return;
+
+    const hasAllTextFields = REQUIRED_TEXT_FIELDS.every((key) => typeof body[key] === 'string' && body[key].trim());
+    if (!hasAllTextFields) {
+      return sendJson(response, 400, { success: false, message: '필수 입력값이 누락되었거나 형식이 올바르지 않습니다.' });
+    }
     if (!Array.isArray(images) || images.length < 1 || images.length > 10 || !Array.isArray(features) || features.length === 0) {
       return sendJson(response, 400, { success: false, message: '이미지는 1~10장, 기능은 한 개 이상 등록해야 합니다.' });
     }
