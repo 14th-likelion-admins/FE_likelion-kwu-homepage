@@ -1,46 +1,21 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+import magazines from '../data/magazines.json'
+import { parseApiResponse } from './apiResponse'
 
-async function request(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, options)
-  let result
+export { uploadImage } from './uploadImage'
 
-  try {
-    result = await response.json()
-  } catch {
-    throw new Error('서버 응답을 읽을 수 없습니다.')
-  }
-
-  if (!response.ok || result?.success === false) {
-    const error = new Error(result?.message || '요청을 처리하지 못했습니다.')
-    error.status = response.status
-    throw error
-  }
-
-  return result.data
-}
-
-export function listGenerations(activityType) {
-  return request(`/api/magazines/${activityType}`)
-}
-
+/**
+ * magazines.json은 빌드에 함께 커밋된 정적 데이터이므로 네트워크 호출 없이 동기적으로 조회한다.
+ */
 export function getMagazine(activityType, generation) {
-  return request(`/api/magazines/${activityType}/${generation}`)
+  return magazines[activityType]?.[String(generation)] ?? null
 }
 
-export function saveMagazine(activityType, generation, payload) {
-  return request(`/api/magazines/${activityType}/${generation}`, {
+export async function saveMagazine(activityType, generation, payload, passphrase) {
+  const response = await fetch('/api/register-magazine', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ passphrase, activityType, generation, ...payload }),
   })
-}
 
-export function uploadImage(file) {
-  const formData = new FormData()
-  formData.append('file', file)
-
-  return request('/api/images', {
-    method: 'POST',
-    body: formData,
-  })
+  return parseApiResponse(response, '매거진 저장에 실패했습니다.')
 }

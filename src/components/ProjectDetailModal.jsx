@@ -20,45 +20,14 @@
  * ============================================================================
  */
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import ImageCarousel from './ImageCarousel'
-import { getProjectDetail } from '../api/projectApi'
-import { mergeBackendDetail } from '../data/mergeProjects'
 
 export const ProjectDetailModal = ({ project, isOpen, onClose }) => {
   const modalRef = useRef(null)
   const scrollPositionRef = useRef(0)
   const didPushModalHistoryRef = useRef(false)
   const closedByPopStateRef = useRef(false)
-  // 백엔드 프로젝트는 목록에 상세 정보(overview/features/images)가 없을 수 있어,
-  // 모달이 열릴 때 상세 API를 조회해서 backendId별로 캐시합니다.
-  const [detailCache, setDetailCache] = useState({})
-  const [detailErrors, setDetailErrors] = useState({})
-
-  useEffect(() => {
-    if (!isOpen || !project || project.detail) return
-    if (project.source !== 'backend' || project.backendId == null) return
-    if (detailCache[project.backendId] || detailErrors[project.backendId]) return
-
-    let cancelled = false
-    getProjectDetail(project.backendId)
-      .then((detailRes) => {
-        if (cancelled) return
-        setDetailCache((prev) => ({
-          ...prev,
-          [project.backendId]: mergeBackendDetail(project, detailRes),
-        }))
-      })
-      .catch((err) => {
-        console.error('프로젝트 상세 정보를 불러오지 못했습니다.', err)
-        if (!cancelled) {
-          setDetailErrors((prev) => ({ ...prev, [project.backendId]: true }))
-        }
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [isOpen, project, detailCache, detailErrors])
 
   // 스크롤 관리 - isOpen 변경 시마다 실행
   useEffect(() => {
@@ -155,12 +124,7 @@ export const ProjectDetailModal = ({ project, isOpen, onClose }) => {
   // 모달이 닫혀있거나 프로젝트 데이터가 없으면 렌더링하지 않음
   if (!isOpen || !project) return null
 
-  // 이미 상세 정보(detail)를 가진 프로젝트(정적 프로젝트 등)는 즉시 표시,
-  // 백엔드 프로젝트는 캐시에 상세 정보가 채워지면 표시
-  const backendDetail = project.backendId != null ? detailCache[project.backendId] : null
-  const hasBackendError = project.backendId != null && detailErrors[project.backendId]
-  const displayProject = project.detail ? project : backendDetail || null
-  const isLoadingDetail = !displayProject && !hasBackendError
+  const displayProject = project.detail ? project : null
 
   return (
     <>
@@ -243,7 +207,7 @@ export const ProjectDetailModal = ({ project, isOpen, onClose }) => {
                   className='py-12 text-center text-gray-500'
                   style={{ fontFamily: "'Inter', sans-serif" }}
                 >
-                  {isLoadingDetail ? '불러오는 중...' : '프로젝트 정보를 불러오지 못했습니다.'}
+                  프로젝트 정보를 불러오지 못했습니다.
                 </div>
               ) : (
                 <>

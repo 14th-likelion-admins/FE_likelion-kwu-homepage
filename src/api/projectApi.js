@@ -1,25 +1,13 @@
-import { request } from './client'
+import { parseApiResponse } from './apiResponse'
 
-export function listProjects() {
-  return request('/api/projects')
-}
+export { uploadImage } from './uploadImage'
 
-export function getProjectDetail(id) {
-  return request(`/api/projects/${id}`)
-}
-
-export function createProject(payload) {
-  return request('/api/projects', {
+export async function registerProject(payload) {
+  const response = await fetch('/api/register-project', {
     method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
   })
-}
 
-export function uploadImage(file) {
-  const formData = new FormData()
-  formData.append('file', file)
-  return request('/api/images', {
-    method: 'POST',
-    body: formData,
-  })
+  return parseApiResponse(response, '프로젝트 등록에 실패했습니다.')
 }

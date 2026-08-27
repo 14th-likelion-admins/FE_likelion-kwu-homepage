@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { createProject, uploadImage } from '../api/projectApi'
+import { registerProject, uploadImage } from '../api/projectApi'
 
 const TAG_OPTIONS = ['WEB', 'APP']
 const GENERATION_OPTIONS = ['14TH', '13TH']
@@ -57,8 +57,10 @@ export default function ProjectFormModal({ isOpen, onClose, onCreated }) {
   const [overview, setOverview] = useState('')
   const [features, setFeatures] = useState([''])
   const [images, setImages] = useState([])
+  const [passphrase, setPassphrase] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const [successMessage, setSuccessMessage] = useState('')
 
   // 모달이 다시 열릴 때 이전 입력을 초기화
   useEffect(() => {
@@ -71,7 +73,9 @@ export default function ProjectFormModal({ isOpen, onClose, onCreated }) {
     setOverview('')
     setFeatures([''])
     setImages([])
+    setPassphrase('')
     setErrorMessage('')
+    setSuccessMessage('')
     setIsSubmitting(false)
   }, [isOpen])
 
@@ -94,6 +98,11 @@ export default function ProjectFormModal({ isOpen, onClose, onCreated }) {
     e.target.value = ''
     if (files.length === 0) return
 
+    if (!passphrase.trim()) {
+      setErrorMessage('운영진 암호를 먼저 입력해 주세요.')
+      return
+    }
+
     const availableSlots = MAX_IMAGES - images.length
     if (files.length > availableSlots) {
       setErrorMessage(`이미지는 최대 ${MAX_IMAGES}장까지 등록할 수 있습니다.`)
@@ -112,20 +121,19 @@ export default function ProjectFormModal({ isOpen, onClose, onCreated }) {
     setImages((prev) => [...prev, ...newEntries])
 
     newEntries.forEach((entry) => {
-      uploadImage(entry.file)
-        .then((result) => {
+      uploadImage(entry.file, 'projects', passphrase)
+        .then((url) => {
           setImages((prev) =>
             prev.map((img) =>
-              img.localId === entry.localId ? { ...img, url: result.url, uploading: false } : img,
+              img.localId === entry.localId ? { ...img, url, uploading: false } : img,
             ),
           )
         })
         .catch((err) => {
+          const message = err.status === 401 ? '운영진 암호가 올바르지 않습니다.' : err.message || '업로드 실패'
           setImages((prev) =>
             prev.map((img) =>
-              img.localId === entry.localId
-                ? { ...img, uploading: false, error: err.message || '업로드 실패' }
-                : img,
+              img.localId === entry.localId ? { ...img, uploading: false, error: message } : img,
             ),
           )
         })
@@ -173,10 +181,14 @@ export default function ProjectFormModal({ isOpen, onClose, onCreated }) {
       setErrorMessage('이미지를 최소 1장 이상 등록해주세요.')
       return
     }
+    if (!passphrase.trim()) {
+      setErrorMessage('운영진 암호를 입력해 주세요.')
+      return
+    }
 
     setIsSubmitting(true)
     try {
-      await createProject({
+      const payload = {
         title: title.trim(),
         tag,
         description: description.trim(),
@@ -185,11 +197,28 @@ export default function ProjectFormModal({ isOpen, onClose, onCreated }) {
         overview: overview.trim(),
         features: trimmedFeatures,
         images: uploadedImageUrls,
+      }
+      const result = await registerProject({ ...payload, passphrase })
+      onCreated?.({
+        id: result.id,
+        title: payload.title,
+        tag: payload.tag,
+        description: payload.description,
+        generation: payload.generation,
+        activity: payload.activity,
+        image: uploadedImageUrls[0],
+        thumbnail: uploadedImageUrls[0],
+        detail: {
+          thumbnail: uploadedImageUrls[0],
+          images: uploadedImageUrls,
+          overview: payload.overview,
+          features: payload.features,
+        },
       })
-      onCreated?.()
-      onClose()
+      setSuccessMessage('등록되었습니다. 배포가 반영되기까지 1분 정도 걸릴 수 있습니다.')
+      setTimeout(onClose, 1500)
     } catch (err) {
-      setErrorMessage(err.message || '프로젝트 등록에 실패했습니다.')
+      setErrorMessage(err.status === 401 ? '운영진 암호가 올바르지 않습니다.' : err.message || '프로젝트 등록에 실패했습니다.')
     } finally {
       setIsSubmitting(false)
     }
@@ -384,7 +413,20 @@ export default function ProjectFormModal({ isOpen, onClose, onCreated }) {
             )}
           </div>
 
+          <div>
+            <label className='mb-1 block text-sm text-white/70'>운영진 암호 *</label>
+            <input
+              type='password'
+              className={inputClassName}
+              value={passphrase}
+              onChange={(e) => setPassphrase(e.target.value)}
+              placeholder='운영진끼리 공유한 암호'
+              required
+            />
+          </div>
+
           {errorMessage && <p className='text-sm text-red-400'>{errorMessage}</p>}
+          {successMessage && <p className='text-sm text-green-400'>{successMessage}</p>}
         </form>
 
         <div className='flex justify-end gap-2 border-t border-white/10 px-6 py-4'>

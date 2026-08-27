@@ -18,6 +18,7 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
   const [generation, setGeneration] = useState(initialGeneration)
   const [title, setTitle] = useState('')
   const [blocks, setBlocks] = useState([createTextBlock()])
+  const [passphrase, setPassphrase] = useState('')
   const [uploadingId, setUploadingId] = useState(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -42,13 +43,17 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
 
   const handleImageUpload = async (blockId, file) => {
     if (!file) return
+    if (!passphrase.trim()) {
+      setError('운영진 암호를 입력해 주세요.')
+      return
+    }
     setError('')
     setUploadingId(blockId)
     try {
-      const image = await uploadImage(file)
-      updateBlock(blockId, { url: image.url })
+      const url = await uploadImage(file, 'magazines', passphrase)
+      updateBlock(blockId, { url })
     } catch (uploadError) {
-      setError(uploadError.message || '이미지 업로드에 실패했습니다.')
+      setError(uploadError.status === 401 ? '운영진 암호가 올바르지 않습니다.' : uploadError.message || '이미지 업로드에 실패했습니다.')
     } finally {
       setUploadingId(null)
     }
@@ -67,14 +72,18 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
       setError('이미지 블록의 파일을 업로드해 주세요.')
       return
     }
+    if (!passphrase.trim()) {
+      setError('운영진 암호를 입력해 주세요.')
+      return
+    }
 
     setSaving(true)
     setError('')
     try {
-      await saveMagazine(activityType, Number(generation), { title: title.trim(), blocks })
+      await saveMagazine(activityType, Number(generation), { title: title.trim(), blocks }, passphrase)
       onSaved({ activityType, generation: Number(generation) })
     } catch (saveError) {
-      setError(saveError.message || '매거진 저장에 실패했습니다.')
+      setError(saveError.status === 401 ? '운영진 암호가 올바르지 않습니다.' : saveError.message || '매거진 저장에 실패했습니다.')
     } finally {
       setSaving(false)
     }
@@ -101,6 +110,10 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
 
         <label className='mt-4 block text-sm'>제목
           <input value={title} onChange={(event) => setTitle(event.target.value)} placeholder='매거진 제목' className='mt-2 w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-white placeholder:text-white/40' />
+        </label>
+
+        <label className='mt-4 block text-sm'>운영진 암호
+          <input type='password' value={passphrase} onChange={(event) => setPassphrase(event.target.value)} placeholder='운영진끼리 공유한 암호' className='mt-2 w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-white placeholder:text-white/40' />
         </label>
 
         <div className='mt-7 space-y-4'>
