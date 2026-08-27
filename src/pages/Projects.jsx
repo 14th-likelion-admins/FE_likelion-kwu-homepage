@@ -75,10 +75,6 @@ export default function Projects() {
   }, [allProjects, selectedGeneration])
 
   // 필터 변경 시 표시 개수 초기화
-  useEffect(() => {
-    setDisplayedProjects((prev) => Math.min(12, filteredProjects.length || prev))
-  }, [filteredProjects.length])
-
   // 무한스크롤 구현
   const loadMoreProjects = useCallback(() => {
     if (isLoading) return
@@ -236,6 +232,7 @@ export default function Projects() {
                     key={gen}
                     onClick={() => {
                       setSelectedGeneration(gen)
+                      setDisplayedProjects(12)
                       setShowGenerationDropdown(false)
                     }}
                     className='w-full px-6 py-3 text-center transition-colors md:px-8 md:py-4 hover:bg-white/10 first:rounded-t-lg last:rounded-b-lg'

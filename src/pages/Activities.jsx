@@ -1,6 +1,9 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
+import MagazineEditorModal from '../components/MagazineEditorModal'
+import { getMagazine } from '../api/magazineApi'
 import noiseTexture from '../assets/activities/Noise & Texture.png'
 import dottedCircle from '../assets/activities/Rectangle.png'
 import cardOt from '../assets/activities/활동소개아이콘1.png'
@@ -9,97 +12,105 @@ import cardHackathon from '../assets/activities/활통소개아이콘3.png'
 import cardIdeathon from '../assets/activities/활동소개아이콘4.png'
 import { loadFonts } from '../utils/fonts'
 
+const GENERATIONS = [14, 13]
+const ACTIVITY_TYPES = { ot: 'OT', ideathon: 'IDEATHON', hackathon: 'HACKATHON' }
 const activityCards = [
-  {
-    id: 'ot',
-    title: 'OT',
-    description: '멋쟁이 사자처럼으로\n향하는 첫 걸음!',
-    image: cardOt,
-  },
-  {
-    id: 'ideathon',
-    title: '아이디어톤',
-    description: '5월, 특정 주제에 맞춰,\n톡톡 튀는 아이디어로\n승부합니다!',
-    image: cardIdeathon,
-  },
-  {
-    id: 'hackathon',
-    title: '해커톤',
-    description: '8월, 멋쟁이사자처럼이\n자부하는 역대급 규모의\n무박 2일 해커톤 행사',
-    image: cardHackathon,
-  },
-  {
-    id: 'project',
-    title: '프로젝트',
-    description: '기획부터 구현까지\n협업 과정을 배우는\n중요 활동',
-    image: cardProject,
-  },
+  { id: 'ot', title: 'OT', description: '멋쟁이사자처럼으로\n함께하는 첫 걸음!', image: cardOt },
+  { id: 'ideathon', title: '아이디어톤', description: '5주간 특정 주제에 맞춰,\n무한한 아이디어를 나누는 행사입니다.', image: cardIdeathon },
+  { id: 'hackathon', title: '해커톤', description: '8주간 멋쟁이사자처럼과 함께\n진행하는 대규모 무박 2일 해커톤 행사', image: cardHackathon },
+  { id: 'project', title: '프로젝트', description: '기획부터 구현까지\n작업 과정을 배우는 중요한 활동', image: cardProject },
 ]
 
+function MagazineContent({ magazine }) {
+  const blocks = Array.isArray(magazine.blocks) ? magazine.blocks : []
+  return <article className='py-8 md:py-10'>
+    <h2 className='text-2xl font-semibold md:text-4xl'>{magazine.title}</h2>
+    {blocks.length === 0 ? <p className='mt-6 text-white/70'>등록된 본문이 없습니다.</p> : <div className='mt-7 space-y-6 md:mt-10 md:space-y-8'>
+      {blocks.map((block, index) => {
+        if (block.type === 'image') return <figure key={block.id || `image-${index}`} className={block.width === 'half' ? 'w-full md:w-1/2' : 'w-full'}>
+          <img src={block.url} alt={block.caption || ''} className='w-full rounded-xl object-cover' />
+          {block.caption && <figcaption className='mt-2 text-sm text-white/65'>{block.caption}</figcaption>}
+        </figure>
+        return block.style === 'heading'
+          ? <h3 key={block.id || `heading-${index}`} className='text-xl font-semibold leading-relaxed md:text-3xl'>{block.text}</h3>
+          : <p key={block.id || `text-${index}`} className='whitespace-pre-wrap text-base leading-relaxed text-white/90 md:text-lg'>{block.text}</p>
+      })}
+    </div>}
+  </article>
+}
+
 export default function Activities() {
+  const navigate = useNavigate()
+  const [selectedActivity, setSelectedActivity] = useState('hackathon')
+  const [selectedGeneration, setSelectedGeneration] = useState(14)
+  const [magazine, setMagazine] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [isEditorOpen, setIsEditorOpen] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  useEffect(() => { loadFonts() }, [])
   useEffect(() => {
-    loadFonts()
-  }, [])
+    let active = true
+    getMagazine(ACTIVITY_TYPES[selectedActivity], selectedGeneration)
+      .then((data) => { if (active) setMagazine(data || null) })
+      .catch((requestError) => { if (active) setError(requestError.message || '매거진을 불러오지 못했습니다.') })
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false }
+  }, [selectedActivity, selectedGeneration, refreshKey])
 
-  return (
-    <div
-      className='relative flex min-h-screen flex-col overflow-x-hidden text-white lg:h-screen lg:overflow-hidden'
-      style={{ backgroundColor: '#111315', fontFamily: 'Space Grotesk' }}
-    >
-      <div
-        className='pointer-events-none absolute inset-0 z-[1] opacity-[0.82]'
-        style={{
-          backgroundImage: `url(${noiseTexture})`,
-          backgroundRepeat: 'repeat-y',
-          backgroundSize: '1740px auto',
-          backgroundPosition: 'top center',
-        }}
-      />
+  const selectCard = (cardId) => {
+    if (cardId === 'project') { navigate('/projectshome'); return }
+    setLoading(true); setError(''); setMagazine(null)
+    if (cardId === selectedActivity && selectedGeneration === 14) setRefreshKey((current) => current + 1)
+    setSelectedActivity(cardId); setSelectedGeneration(14)
+  }
+  const selectGeneration = (generation) => {
+    setLoading(true); setError(''); setMagazine(null)
+    if (generation === selectedGeneration) setRefreshKey((current) => current + 1)
+    setSelectedGeneration(generation)
+  }
+  const handleCardKeyDown = (event, cardId) => {
+    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectCard(cardId) }
+  }
+  const handleSaved = ({ activityType, generation }) => {
+    const activityId = Object.entries(ACTIVITY_TYPES).find(([, type]) => type === activityType)?.[0]
+    if (activityId) setSelectedActivity(activityId)
+    setLoading(true); setError(''); setMagazine(null)
+    setSelectedGeneration(generation); setIsEditorOpen(false); setRefreshKey((current) => current + 1)
+  }
 
-      <Header />
-
-      <main className='relative z-10 flex-1 overflow-x-hidden px-4 pb-8 pt-28 md:px-6 md:pt-36 lg:pb-2 lg:pt-20'>
-        <section className='relative mx-auto max-w-[1360px] overflow-x-hidden'>
-          <img
-            src={dottedCircle}
-            alt=''
-            className='pointer-events-none absolute left-1/2 top-[54%] w-[860px] max-w-[72vw] -translate-x-1/2 -translate-y-1/2 opacity-85'
-          />
-
-          <h1 className='text-center text-[14px] font-semibold tracking-tight md:text-[20px]'>
-            광운대 멋쟁이사자처럼 활동을 소개합니다
-          </h1>
-
-          <div className='mt-10 grid grid-cols-1 gap-[30px] sm:grid-cols-2 sm:gap-5 lg:mt-8 lg:grid-cols-4 lg:gap-0.5'>
-            {activityCards.map((card) => (
-              <article
-                key={card.id}
-                className='relative mx-auto flex h-[136px] w-full max-w-[268px] flex-row items-center gap-4 rounded-[16px] border border-white/85 bg-white/[0.22] px-5 py-4 sm:h-[500px] sm:flex-col sm:items-center sm:rounded-[30px] sm:px-6 sm:pb-8 sm:pt-10 lg:h-[420px] lg:max-w-[276px]'
-              >
-                <div className='flex h-[82px] w-[82px] shrink-0 items-center justify-center sm:h-[220px] sm:w-full'>
-                  <img
-                    src={card.image}
-                    alt=''
-                    className='w-full object-contain sm:w-[85%]'
-                  />
-                </div>
-                <div className='flex-1 sm:mt-auto sm:w-full sm:flex-none sm:-translate-y-[50px]'>
-                  <h2 className='text-left text-[18px] font-normal leading-[1.1] sm:flex sm:h-[76px] sm:items-end sm:justify-center sm:text-center sm:text-[26px] sm:font-semibold lg:text-[24px]'>
-                    {card.title}
-                  </h2>
-                  <p className='mt-2 whitespace-pre-line text-left text-[12px] font-normal leading-[1.28] text-white/95 sm:mt-4 sm:min-h-[116px] sm:text-center sm:text-[16px] sm:font-medium sm:leading-[1.28] lg:text-[14px]'>
-                    {card.description}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
+  return <div className='relative flex min-h-screen flex-col overflow-x-hidden text-white' style={{ backgroundColor: '#111315', fontFamily: 'Space Grotesk' }}>
+    <div className='pointer-events-none absolute inset-0 z-[1] opacity-[0.82]' style={{ backgroundImage: `url(${noiseTexture})`, backgroundRepeat: 'repeat-y', backgroundSize: '1740px auto', backgroundPosition: 'top center' }} />
+    <Header />
+    <main className='relative z-10 flex-1 overflow-x-hidden px-4 pb-12 pt-28 md:px-6 md:pt-36 lg:pt-20'>
+      <section className='relative mx-auto max-w-[1360px] overflow-x-hidden'>
+        <img src={dottedCircle} alt='' className='pointer-events-none absolute left-1/2 top-[28%] w-[860px] max-w-[72vw] -translate-x-1/2 -translate-y-1/2 opacity-85' />
+        <h1 className='text-center text-[14px] font-semibold tracking-tight md:text-[20px]'>광운대 멋쟁이사자처럼의 활동을 소개합니다.</h1>
+        <div className='mt-10 grid grid-cols-1 gap-[30px] sm:grid-cols-2 sm:gap-5 lg:mt-8 lg:grid-cols-4 lg:gap-0.5'>
+          {activityCards.map((card) => {
+            const selected = card.id === selectedActivity
+            return <article key={card.id} role='button' tabIndex={0} onClick={() => selectCard(card.id)} onKeyDown={(event) => handleCardKeyDown(event, card.id)} className={`group relative mx-auto flex h-[136px] w-full max-w-[268px] cursor-pointer flex-row items-center gap-4 overflow-hidden rounded-[16px] border bg-white/[0.22] px-5 py-4 transition sm:h-[500px] sm:flex-col sm:items-center sm:rounded-[30px] sm:px-6 sm:pb-8 sm:pt-10 lg:h-[420px] lg:max-w-[276px] ${selected ? 'border-orange-300 shadow-[0_0_20px_rgba(255,153,102,0.3)]' : 'border-white/85'} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-orange-300`} aria-label={card.id === 'project' ? '프로젝트 페이지로 이동' : `${card.title} 매거진 보기`}>
+              <span aria-hidden='true' className='activity-card-shine pointer-events-none absolute inset-y-[-20%] left-0 z-10 w-[35%] bg-gradient-to-r from-transparent via-white/45 to-transparent' />
+              <div className='flex h-[82px] w-[82px] shrink-0 items-center justify-center sm:h-[220px] sm:w-full'><img src={card.image} alt='' className='w-full object-contain sm:w-[85%]' /></div>
+              <div className='flex-1 sm:mt-auto sm:w-full sm:flex-none sm:-translate-y-[50px]'><h2 className='text-left text-[18px] font-normal leading-[1.1] sm:flex sm:h-[76px] sm:items-end sm:justify-center sm:text-center sm:text-[26px] sm:font-semibold lg:text-[24px]'>{card.title}</h2><p className='mt-2 whitespace-pre-line text-left text-[12px] font-normal leading-[1.28] text-white/95 sm:mt-4 sm:min-h-[116px] sm:text-center sm:text-[16px] sm:font-medium sm:leading-[1.28] lg:text-[14px]'>{card.description}</p></div>
+            </article>
+          })}
+        </div>
+        <section className='relative mt-12 pb-6 md:mt-16' aria-label='활동 매거진'>
+          <div className='flex items-center justify-between gap-4'><div className='flex gap-2'>{GENERATIONS.map((generation) => {
+            const active = generation === selectedGeneration
+            return <button key={generation} type='button' onClick={() => selectGeneration(generation)} className={`inline-flex h-10 min-w-12 items-center justify-center rounded-full border px-4 text-sm font-semibold transition ${active ? 'border-orange-300 bg-white text-orange-500 shadow-[0_0_16px_rgba(255,153,102,0.35)]' : 'border-white/35 bg-transparent text-white hover:border-white/70'}`}>{generation}th</button>
+          })}</div><button type='button' onClick={() => setIsEditorOpen(true)} className='inline-flex h-10 items-center gap-1 rounded-full border border-orange-300 bg-white px-4 text-sm font-semibold text-orange-500 transition hover:bg-orange-50' aria-label='매거진 등록'>+ 등록</button></div>
+          <div className='mt-5 border-t border-white/25' />
+          {loading && <div className='flex min-h-48 items-center justify-center gap-3 text-white/75'><span className='h-6 w-6 animate-spin rounded-full border-2 border-white/25 border-t-orange-300' />매거진을 불러오는 중입니다.</div>}
+          {!loading && error && <div role='alert' className='py-10 text-center text-red-200'>매거진을 불러오지 못했습니다. {error}</div>}
+          {!loading && !error && !magazine && <div className='py-12 text-center text-white/65'>등록된 매거진이 없습니다.</div>}
+          {!loading && !error && magazine && <MagazineContent magazine={magazine} />}
         </section>
-      </main>
-
-      <div className='relative z-20 w-full px-4 pb-3'>
-        <Footer />
-      </div>
-    </div>
-  )
+      </section>
+    </main>
+    <div className='relative z-20 w-full px-4 pb-3'><Footer /></div>
+    {isEditorOpen && <MagazineEditorModal initialActivity={ACTIVITY_TYPES[selectedActivity]} initialGeneration={selectedGeneration} onClose={() => setIsEditorOpen(false)} onSaved={handleSaved} />}
+  </div>
 }

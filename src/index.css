@@ -29,6 +29,20 @@ body {
   .bg-gradient-radial {
     background: radial-gradient(circle, var(--tw-gradient-stops));
   }
+
+  .activity-card-shine {
+    transform: translateX(-135%) skewX(-20deg);
+  }
+
+  .group:hover .activity-card-shine,
+  .group:focus-visible .activity-card-shine {
+    animation: activity-card-shine 700ms ease-out;
+  }
+}
+
+@keyframes activity-card-shine {
+  from { transform: translateX(-135%) skewX(-20deg); }
+  to { transform: translateX(175%) skewX(-20deg); }
 }
 
 /* 전역 스크롤바 스타일 */

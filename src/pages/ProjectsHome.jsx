@@ -155,23 +155,13 @@ export default function ProjectsHome() {
   const cardWidth = 545 * scale
   const cardHeight = 364 * scale
   const cardGap = 48 * scale
-  const firstCardLeft = `${(437 + 200 + 100) * scale}px`
-  const firstCardTop = (120 + 293 + 60 - 200 + 120) * scale
   const worksLeftValue = (73 + 30 + 50 + 30 + 20 + 20) * scale
-  const worksLeft = `${worksLeftValue}px`
-  const worksTop = (626 - 50 - 8) * scale
   const worksTextLeftValue = worksLeftValue + 5 * scale
   const buttonSize = 100 * scale
   const leftButtonLeftValue = worksLeftValue
-  const leftButtonLeft = `${leftButtonLeftValue}px`
-  const leftButtonTop = (710 - 50) * scale
   const buttonGap = 20 * scale
   const rightButtonLeftValue = leftButtonLeftValue + buttonSize + buttonGap
-  const rightButtonLeft = `${rightButtonLeftValue}px`
-  const rightButtonTop = (710 - 50) * scale
   const moreButtonLeftValue = leftButtonLeftValue
-  const moreButtonLeft = `${moreButtonLeftValue}px`
-  const moreButtonTop = (838 - 50) * scale
 
   const handleDragStart = (clientX) => {
     dragStartXRef.current = clientX

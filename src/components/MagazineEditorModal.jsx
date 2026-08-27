@@ -1,0 +1,150 @@
+import { useState } from 'react'
+import { saveMagazine, uploadImage } from '../api/magazineApi'
+
+const ACTIVITY_OPTIONS = [
+  { value: 'OT', label: 'OT' },
+  { value: 'IDEATHON', label: '아이디어톤' },
+  { value: 'HACKATHON', label: '해커톤' },
+]
+
+const createId = () =>
+  globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`
+
+const createTextBlock = () => ({ id: createId(), type: 'text', text: '', style: 'paragraph' })
+const createImageBlock = () => ({ id: createId(), type: 'image', url: '', caption: '', width: 'full' })
+
+export default function MagazineEditorModal({ initialActivity, initialGeneration, onClose, onSaved }) {
+  const [activityType, setActivityType] = useState(initialActivity)
+  const [generation, setGeneration] = useState(initialGeneration)
+  const [title, setTitle] = useState('')
+  const [blocks, setBlocks] = useState([createTextBlock()])
+  const [uploadingId, setUploadingId] = useState(null)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  const updateBlock = (id, updates) => {
+    setBlocks((current) => current.map((block) => (block.id === id ? { ...block, ...updates } : block)))
+  }
+
+  const insertBlock = (index, block) => {
+    setBlocks((current) => [...current.slice(0, index), block, ...current.slice(index)])
+  }
+
+  const moveBlock = (index, direction) => {
+    const nextIndex = index + direction
+    if (nextIndex < 0 || nextIndex >= blocks.length) return
+    setBlocks((current) => {
+      const next = [...current]
+      ;[next[index], next[nextIndex]] = [next[nextIndex], next[index]]
+      return next
+    })
+  }
+
+  const handleImageUpload = async (blockId, file) => {
+    if (!file) return
+    setError('')
+    setUploadingId(blockId)
+    try {
+      const image = await uploadImage(file)
+      updateBlock(blockId, { url: image.url })
+    } catch (uploadError) {
+      setError(uploadError.message || '이미지 업로드에 실패했습니다.')
+    } finally {
+      setUploadingId(null)
+    }
+  }
+
+  const handleSave = async () => {
+    if (!title.trim()) {
+      setError('매거진 제목을 입력해 주세요.')
+      return
+    }
+    if (!Number.isInteger(Number(generation)) || Number(generation) < 1) {
+      setError('올바른 기수를 입력해 주세요.')
+      return
+    }
+    if (blocks.some((block) => block.type === 'image' && !block.url)) {
+      setError('이미지 블록의 파일을 업로드해 주세요.')
+      return
+    }
+
+    setSaving(true)
+    setError('')
+    try {
+      await saveMagazine(activityType, Number(generation), { title: title.trim(), blocks })
+      onSaved({ activityType, generation: Number(generation) })
+    } catch (saveError) {
+      setError(saveError.message || '매거진 저장에 실패했습니다.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4' role='dialog' aria-modal='true' aria-labelledby='magazine-editor-title'>
+      <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-white/20 bg-[#191c20] p-5 text-white shadow-2xl md:p-8'>
+        <div className='flex items-center justify-between gap-4'>
+          <h2 id='magazine-editor-title' className='text-xl font-semibold md:text-2xl'>매거진 등록</h2>
+          <button type='button' onClick={onClose} className='text-2xl text-white/70 hover:text-white' aria-label='모달 닫기'>×</button>
+        </div>
+
+        <div className='mt-6 grid gap-4 sm:grid-cols-2'>
+          <label className='text-sm'>활동
+            <select value={activityType} onChange={(event) => setActivityType(event.target.value)} className='mt-2 w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-white'>
+              {ACTIVITY_OPTIONS.map((option) => <option key={option.value} value={option.value} className='bg-[#191c20]'>{option.label}</option>)}
+            </select>
+          </label>
+          <label className='text-sm'>기수
+            <input type='number' min='1' value={generation} onChange={(event) => setGeneration(event.target.value)} className='mt-2 w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-white' />
+          </label>
+        </div>
+
+        <label className='mt-4 block text-sm'>제목
+          <input value={title} onChange={(event) => setTitle(event.target.value)} placeholder='매거진 제목' className='mt-2 w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-white placeholder:text-white/40' />
+        </label>
+
+        <div className='mt-7 space-y-4'>
+          {blocks.map((block, index) => (
+            <div key={block.id} className='rounded-xl border border-white/20 bg-black/15 p-4'>
+              <div className='mb-3 flex flex-wrap items-center justify-between gap-2 text-sm'>
+                <span className='text-white/65'>{block.type === 'text' ? '텍스트 블록' : '이미지 블록'}</span>
+                <div className='flex gap-1'>
+                  <button type='button' onClick={() => moveBlock(index, -1)} disabled={index === 0} className='rounded px-2 py-1 hover:bg-white/10 disabled:opacity-30' aria-label='위로 이동'>↑</button>
+                  <button type='button' onClick={() => moveBlock(index, 1)} disabled={index === blocks.length - 1} className='rounded px-2 py-1 hover:bg-white/10 disabled:opacity-30' aria-label='아래로 이동'>↓</button>
+                  <button type='button' onClick={() => setBlocks((current) => current.filter((item) => item.id !== block.id))} className='rounded px-2 py-1 text-red-300 hover:bg-white/10' aria-label='블록 삭제'>삭제</button>
+                </div>
+              </div>
+              {block.type === 'text' ? (
+                <>
+                  <select value={block.style} onChange={(event) => updateBlock(block.id, { style: event.target.value })} className='mb-3 rounded border border-white/25 bg-[#191c20] px-2 py-1 text-sm'>
+                    <option value='paragraph'>문단</option><option value='heading'>제목</option>
+                  </select>
+                  <textarea value={block.text} onChange={(event) => updateBlock(block.id, { text: event.target.value })} placeholder='내용을 입력하세요.' rows='4' className='w-full resize-y rounded-lg border border-white/25 bg-white/10 p-3 text-white placeholder:text-white/40' />
+                </>
+              ) : (
+                <div className='space-y-3'>
+                  <input type='file' accept='image/*' onChange={(event) => handleImageUpload(block.id, event.target.files?.[0])} disabled={uploadingId === block.id} className='block w-full text-sm text-white/75 file:mr-3 file:rounded file:border-0 file:bg-orange-300 file:px-3 file:py-1 file:text-[#111315]' />
+                  {uploadingId === block.id && <p className='text-sm text-orange-200'>이미지를 업로드하고 있습니다…</p>}
+                  {block.url && <img src={block.url} alt='업로드 미리보기' className='max-h-56 rounded-lg object-contain' />}
+                  <input value={block.caption} onChange={(event) => updateBlock(block.id, { caption: event.target.value })} placeholder='이미지 설명 (선택)' className='w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-white placeholder:text-white/40' />
+                  <select value={block.width} onChange={(event) => updateBlock(block.id, { width: event.target.value })} className='rounded border border-white/25 bg-[#191c20] px-2 py-1 text-sm'><option value='full'>전체 너비</option><option value='half'>반 너비</option></select>
+                </div>
+              )}
+              <div className='mt-4 flex gap-2 border-t border-white/10 pt-3'>
+                <button type='button' onClick={() => insertBlock(index + 1, createTextBlock())} className='rounded-md border border-white/25 px-3 py-1.5 text-sm hover:bg-white/10'>+ 텍스트</button>
+                <button type='button' onClick={() => insertBlock(index + 1, createImageBlock())} className='rounded-md border border-white/25 px-3 py-1.5 text-sm hover:bg-white/10'>+ 이미지</button>
+              </div>
+            </div>
+          ))}
+          {blocks.length === 0 && <button type='button' onClick={() => setBlocks([createTextBlock()])} className='rounded-md border border-dashed border-white/35 px-3 py-2 text-sm hover:bg-white/10'>+ 첫 블록 추가</button>}
+        </div>
+
+        {error && <p role='alert' className='mt-4 text-sm text-red-300'>{error}</p>}
+        <div className='mt-7 flex justify-end gap-3'>
+          <button type='button' onClick={onClose} className='rounded-lg border border-white/30 px-4 py-2 text-sm hover:bg-white/10'>취소</button>
+          <button type='button' onClick={handleSave} disabled={saving || uploadingId !== null} className='rounded-lg bg-orange-300 px-4 py-2 text-sm font-semibold text-[#111315] hover:bg-orange-200 disabled:cursor-not-allowed disabled:opacity-60'>{saving ? '저장 중…' : '저장'}</button>
+        </div>
+      </div>
+    </div>
+  )
+}

@@ -11,13 +11,11 @@ export default function Header() {
   const mobileMenuRef = useRef(null)
   const navigate = useNavigate()
 
-  const handleProjectClick = (e) => {
-    try {
-      if (window && window.innerWidth < 768) {
-        e.preventDefault()
-        navigate('/projects')
-      }
-    } catch (err) {}
+  const handleProjectClick = (event) => {
+    if (window.innerWidth < 768) {
+      event.preventDefault()
+      navigate('/projects')
+    }
   }
 
   useEffect(() => {
