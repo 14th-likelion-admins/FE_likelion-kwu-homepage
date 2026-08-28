@@ -95,7 +95,7 @@ export default function Activities() {
           <div className='flex items-center justify-between gap-4'><div className='flex gap-2'>{GENERATIONS.map((generation) => {
             const active = generation === selectedGeneration
             return <button key={generation} type='button' onClick={() => selectGeneration(generation)} className={`inline-flex h-10 min-w-12 items-center justify-center rounded-full border px-4 text-sm font-semibold transition ${active ? 'border-orange-300 bg-white text-orange-500 shadow-[0_0_16px_rgba(255,153,102,0.35)]' : 'border-white/35 bg-transparent text-white hover:border-white/70'}`}>{generation}th</button>
-          })}</div><div className='flex flex-col items-end gap-0.5'>
+          })}</div><div className='flex items-center gap-1'>
             <button type='button' onClick={() => openEditor('create')} className='inline-flex h-8 items-center rounded-full px-2 text-sm font-medium text-white/40 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60' aria-label='매거진 등록'>+ 등록</button>
             {magazine && <button type='button' onClick={() => openEditor('edit')} className='inline-flex h-8 items-center rounded-full px-2 text-sm font-medium text-white/40 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60' aria-label='현재 매거진 수정'>수정</button>}
           </div></div>
