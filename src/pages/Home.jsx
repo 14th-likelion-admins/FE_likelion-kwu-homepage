@@ -123,7 +123,7 @@ export default function Home() {
           style={{
             backgroundImage: `url(${noiseBg})`,
             backgroundRepeat: 'repeat',
-            backgroundSize: '512px 512px',
+            backgroundSize: '256px 256px',
             opacity: 0.5,
           }}
         ></div>

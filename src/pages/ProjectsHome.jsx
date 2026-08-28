@@ -251,7 +251,7 @@ export default function ProjectsHome() {
           style={{
             backgroundImage: `url(${noiseTexture})`,
             backgroundRepeat: 'repeat',
-            backgroundSize: '512px 512px',
+            backgroundSize: '256px 256px',
             bottom: 0,
             left: 0,
             right: 0,
