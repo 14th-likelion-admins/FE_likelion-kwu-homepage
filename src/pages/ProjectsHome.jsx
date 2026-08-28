@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import bkImage1 from '../assets/bk-image-1.png'
-import noiseTexture from '../assets/noise-texture.png'
+import noiseTexture from '../assets/noise-texture-tile.webp'
 import useProjects from '../hooks/useProjects'
 import ProjectDetailModal from '../components/ProjectDetailModal'
 
@@ -248,6 +248,7 @@ export default function ProjectsHome() {
           style={{
             backgroundImage: `url(${noiseTexture})`,
             backgroundRepeat: 'repeat',
+            backgroundSize: '512px 512px',
             bottom: 0,
             left: 0,
             right: 0,

@@ -1,0 +1,39 @@
+Thresholds (0-255 scale): mean range <= 3; stdev range <= 4
+
+src/assets/noise-bg.png (1728x4678)
+  channel 0: mean range=0.000000, stdev range=0.000000
+  channel 1: mean range=0.000000, stdev range=0.000000
+  channel 2: mean range=0.000000, stdev range=0.000000
+  channel 3: mean range=0.000000, stdev range=0.000000
+  verdict: uniform grain
+
+src/assets/recruit/Noise & Texture.png (1727x3900)
+  channel 0: mean range=0.000000, stdev range=0.000000
+  channel 1: mean range=0.000000, stdev range=0.000000
+  channel 2: mean range=0.000000, stdev range=0.000000
+  channel 3: mean range=0.000000, stdev range=0.000000
+  verdict: uniform grain
+
+src/assets/activities/Noise & Texture.png (1728x1114)
+  channel 0: mean range=0.000000, stdev range=0.000000
+  channel 1: mean range=0.000000, stdev range=0.000000
+  channel 2: mean range=0.000000, stdev range=0.000000
+  channel 3: mean range=0.000000, stdev range=0.000000
+  verdict: uniform grain
+
+src/assets/noise-texture.png (1728x1114)
+  channel 0: mean range=0.000000, stdev range=0.000000
+  channel 1: mean range=0.000000, stdev range=0.000000
+  channel 2: mean range=0.000000, stdev range=0.000000
+  channel 3: mean range=0.000000, stdev range=0.000000
+  verdict: uniform grain
+
+src/assets/noise-star.png (1728x1123)
+  channel 0: mean range=0.000000, stdev range=0.000000
+  channel 1: mean range=0.000000, stdev range=0.000000
+  channel 2: mean range=0.000000, stdev range=0.000000
+  channel 3: mean range=0.000000, stdev range=0.000000
+  verdict: uniform grain
+
+Manual review: noise-star.png has a directional density/color structure; use full-image WebP instead of a 512px tile.
+

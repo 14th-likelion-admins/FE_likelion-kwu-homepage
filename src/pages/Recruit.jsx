@@ -1,7 +1,7 @@
 ﻿import { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import recruitNoise from '../assets/recruit/Noise & Texture.png'
+import recruitNoise from '../assets/recruit/noise-texture-recruit-tile.webp'
 import leftHalf from '../assets/recruit/left_half.png'
 import fullCircle from '../assets/recruit/full_circle.png'
 import halfCircleLine from '../assets/recruit/half_circle_line.png'
@@ -72,8 +72,8 @@ export default function Recruit() {
         className='pointer-events-none absolute inset-0 z-[1] opacity-[0.82]'
         style={{
           backgroundImage: `url(${recruitNoise})`,
-          backgroundRepeat: 'repeat-y',
-          backgroundSize: '1940px auto',
+          backgroundRepeat: 'repeat',
+          backgroundSize: '512px 512px',
           backgroundPosition: 'top center',
         }}
       />

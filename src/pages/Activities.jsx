@@ -4,7 +4,7 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import MagazineEditorModal from '../components/MagazineEditorModal'
 import { getMagazine } from '../api/magazineApi'
-import noiseTexture from '../assets/activities/Noise & Texture.png'
+import noiseTexture from '../assets/activities/noise-texture-activities-tile.webp'
 import dottedCircle from '../assets/activities/Rectangle.png'
 import cardOt from '../assets/activities/활동소개아이콘1.png'
 import cardProject from '../assets/activities/활동소개아이콘2.png'
@@ -73,7 +73,7 @@ export default function Activities() {
   }
 
   return <div className='relative flex min-h-screen flex-col overflow-x-hidden text-white' style={{ backgroundColor: '#111315', fontFamily: 'Space Grotesk' }}>
-    <div className='pointer-events-none absolute inset-0 z-[1] opacity-[0.82]' style={{ backgroundImage: `url(${noiseTexture})`, backgroundRepeat: 'repeat-y', backgroundSize: '1740px auto', backgroundPosition: 'top center' }} />
+    <div className='pointer-events-none absolute inset-0 z-[1] opacity-[0.82]' style={{ backgroundImage: `url(${noiseTexture})`, backgroundRepeat: 'repeat', backgroundSize: '512px 512px', backgroundPosition: 'top center' }} />
     <Header />
     <main className='relative z-10 flex-1 overflow-x-hidden px-4 pb-12 pt-28 md:px-6 md:pt-36 lg:pt-20'>
       <section className='relative mx-auto max-w-[1360px] overflow-x-hidden'>

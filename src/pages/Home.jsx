@@ -7,9 +7,9 @@ import Core1 from '../assets/corevalue1.png'
 import Core2 from '../assets/corevalue2.png'
 import Core3 from '../assets/corevalue3.png'
 import mainsun from '../assets/mainsun.png'
-import noiseBg from '../assets/noise-bg.png'
-import noiseStar from '../assets/noise-star.png'
-import gradiantBg from '../assets/gradiant-bg.png'
+import noiseBg from '../assets/noise-bg-tile.webp'
+import noiseStar from '../assets/noise-star.webp'
+import gradiantBg from '../assets/gradiant-bg.webp'
 import supportButton from '../assets/support-button.png'
 
 import { LINKS } from '../utils/links'
@@ -123,6 +123,7 @@ export default function Home() {
           style={{
             backgroundImage: `url(${noiseBg})`,
             backgroundRepeat: 'repeat',
+            backgroundSize: '512px 512px',
             opacity: 0.5,
           }}
         ></div>
