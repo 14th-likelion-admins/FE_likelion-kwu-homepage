@@ -305,9 +305,9 @@ export default function Projects() {
                     aspectRatio: '375 / 211',
                   }}
                 >
-                  {project.image ? (
+                  {project.thumbnail || project.image ? (
                     <img
-                      src={project.image}
+                      src={project.thumbnail || project.image}
                       alt={project.title}
                       loading='lazy'
                       decoding='async'

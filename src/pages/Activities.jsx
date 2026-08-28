@@ -113,11 +113,11 @@ export default function Activities() {
   }
 
   return <div className='relative flex min-h-screen flex-col overflow-x-hidden text-white' style={{ backgroundColor: '#111315', fontFamily: 'Space Grotesk' }}>
-    <div className='pointer-events-none absolute inset-0 z-[1] opacity-[0.82]' style={{ backgroundImage: `url(${noiseTexture})`, backgroundRepeat: 'repeat', backgroundSize: '512px 512px', backgroundPosition: 'top center' }} />
+    <div className='pointer-events-none absolute inset-0 z-[1] opacity-[0.82]' style={{ backgroundImage: `url(${noiseTexture})`, backgroundRepeat: 'repeat', backgroundSize: '256px 256px', backgroundPosition: 'top center' }} />
     <Header />
     <main className='relative z-10 flex-1 overflow-x-hidden px-4 pb-12 pt-28 md:px-6 md:pt-36 lg:pt-20'>
       <section className='relative mx-auto max-w-[1360px] overflow-x-hidden'>
-        <img src={dottedCircle} alt='' width='1445' height='1114' loading='eager' decoding='async' className='pointer-events-none absolute left-1/2 top-[28%] w-[860px] max-w-[72vw] -translate-x-1/2 -translate-y-1/2 opacity-85' />
+        <img src={dottedCircle} alt='' width='1200' height='925' loading='eager' decoding='async' className='pointer-events-none absolute left-1/2 top-[28%] w-[860px] max-w-[72vw] -translate-x-1/2 -translate-y-1/2 opacity-85' />
         <h1 className='text-center text-[14px] font-semibold tracking-tight md:text-[20px]'>광운대 멋쟁이사자처럼의 활동을 소개합니다.</h1>
         <div className='mb-[30px] mt-10 grid grid-cols-1 gap-[30px] sm:grid-cols-2 sm:gap-5 lg:mt-8 lg:grid-cols-4 lg:gap-0.5'>
           {activityCards.map((card) => {

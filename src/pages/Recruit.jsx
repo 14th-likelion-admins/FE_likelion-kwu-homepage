@@ -73,7 +73,7 @@ export default function Recruit() {
         style={{
           backgroundImage: `url(${recruitNoise})`,
           backgroundRepeat: 'repeat',
-          backgroundSize: '512px 512px',
+          backgroundSize: '256px 256px',
           backgroundPosition: 'top center',
         }}
       />
