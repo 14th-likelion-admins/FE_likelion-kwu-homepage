@@ -19,3 +19,16 @@ export async function saveMagazine(activityType, generation, payload, passphrase
 
   return parseApiResponse(response, '매거진 저장에 실패했습니다.')
 }
+
+/**
+ * 본문에 딸린 업로드 이미지는 public/uploads에 남는다. 서버 쪽 주석 참고.
+ */
+export async function deleteMagazine(activityType, generation, passphrase) {
+  const response = await fetch('/api/register-magazine', {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ passphrase, activityType, generation }),
+  })
+
+  return parseApiResponse(response, '매거진 삭제에 실패했습니다.')
+}

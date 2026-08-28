@@ -1,8 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import MagazineEditorModal from '../components/MagazineEditorModal'
 import { getMagazine } from '../api/magazineApi'
 import noiseTexture from '../assets/activities/noise-texture-activities-tile.webp'
 import dottedCircle from '../assets/activities/Rectangle.webp'
@@ -11,6 +10,10 @@ import cardProject from '../assets/activities/활동소개아이콘2.webp'
 import cardHackathon from '../assets/activities/활통소개아이콘3.webp'
 import cardIdeathon from '../assets/activities/활동소개아이콘4.webp'
 import { loadFonts } from '../utils/fonts'
+import { toRows } from '../utils/magazineBlocks'
+
+// 에디터는 운영진만 열고 드래그 라이브러리까지 딸려 오므로, 방문자 번들에서 떼어낸다.
+const MagazineEditorModal = lazy(() => import('../components/MagazineEditorModal'))
 
 const GENERATIONS = [14, 13]
 const ACTIVITY_TYPES = { ot: 'OT', ideathon: 'IDEATHON', hackathon: 'HACKATHON' }
@@ -21,20 +24,27 @@ const activityCards = [
   { id: 'project', title: '프로젝트', description: '기획부터 구현까지\n작업 과정을 배우는 중요한 활동', image: cardProject, width: 310, height: 310 },
 ]
 
+function MagazineItem({ item }) {
+  if (item.type === 'image') return <figure>
+    <img src={item.url} alt={item.caption || ''} loading='lazy' decoding='async' className='w-full rounded-xl object-cover' />
+    {item.caption && <figcaption className='mt-2 text-sm text-white/65'>{item.caption}</figcaption>}
+  </figure>
+  return item.style === 'heading'
+    ? <h3 className='text-xl font-semibold leading-relaxed md:text-3xl'>{item.text}</h3>
+    : <p className='whitespace-pre-wrap text-base leading-relaxed text-white/90 md:text-lg'>{item.text}</p>
+}
+
 function MagazineContent({ magazine }) {
-  const blocks = Array.isArray(magazine.blocks) ? magazine.blocks : []
+  // 한 행에 여러 항목이 오면 md 이상에서만 가로로 눕히고, 모바일에서는 세로로 쌓는다.
+  const rows = useMemo(() => toRows(magazine.blocks), [magazine.blocks])
   return <article className='py-8 md:py-10'>
     <h2 className='text-2xl font-semibold md:text-4xl'>{magazine.title}</h2>
-    {blocks.length === 0 ? <p className='mt-6 text-white/70'>등록된 본문이 없습니다.</p> : <div className='mt-7 space-y-6 md:mt-10 md:space-y-8'>
-      {blocks.map((block, index) => {
-        if (block.type === 'image') return <figure key={block.id || `image-${index}`} className={block.width === 'half' ? 'w-full md:w-1/2' : 'w-full'}>
-          <img src={block.url} alt={block.caption || ''} loading='lazy' decoding='async' className='w-full rounded-xl object-cover' />
-          {block.caption && <figcaption className='mt-2 text-sm text-white/65'>{block.caption}</figcaption>}
-        </figure>
-        return block.style === 'heading'
-          ? <h3 key={block.id || `heading-${index}`} className='text-xl font-semibold leading-relaxed md:text-3xl'>{block.text}</h3>
-          : <p key={block.id || `text-${index}`} className='whitespace-pre-wrap text-base leading-relaxed text-white/90 md:text-lg'>{block.text}</p>
-      })}
+    {rows.length === 0 ? <p className='mt-6 text-white/70'>등록된 본문이 없습니다.</p> : <div className='mt-7 space-y-6 md:mt-10 md:space-y-8'>
+      {rows.map((row) => <div key={row.id} className='flex flex-col gap-5 md:flex-row md:items-start md:gap-6'>
+        {row.items.map((item) => <div key={item.id} className={row.items.length === 1 && item.width === 'half' ? 'w-full md:w-1/2' : 'min-w-0 flex-1'}>
+          <MagazineItem item={item} />
+        </div>)}
+      </div>)}
     </div>}
   </article>
 }
@@ -73,6 +83,10 @@ export default function Activities() {
     setEditorMode(null)
     setSavedNotice('저장되었습니다. 배포가 반영되기까지 1분 정도 걸릴 수 있습니다.')
   }
+  const handleDeleted = () => {
+    setEditorMode(null)
+    setSavedNotice('삭제되었습니다. 배포가 반영되기까지 1분 정도 걸릴 수 있습니다.')
+  }
 
   return <div className='relative flex min-h-screen flex-col overflow-x-hidden text-white' style={{ backgroundColor: '#111315', fontFamily: 'Space Grotesk' }}>
     <div className='pointer-events-none absolute inset-0 z-[1] opacity-[0.82]' style={{ backgroundImage: `url(${noiseTexture})`, backgroundRepeat: 'repeat', backgroundSize: '512px 512px', backgroundPosition: 'top center' }} />
@@ -96,7 +110,7 @@ export default function Activities() {
             const active = generation === selectedGeneration
             return <button key={generation} type='button' onClick={() => selectGeneration(generation)} className={`inline-flex h-10 min-w-12 items-center justify-center rounded-full border px-4 text-sm font-semibold transition ${active ? 'border-orange-300 bg-white text-orange-500 shadow-[0_0_16px_rgba(255,153,102,0.35)]' : 'border-white/35 bg-transparent text-white hover:border-white/70'}`}>{generation}th</button>
           })}</div><div className='flex items-center gap-1'>
-            <button type='button' onClick={() => openEditor('create')} className='inline-flex h-8 items-center rounded-full px-2 text-sm font-medium text-white/40 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60' aria-label='매거진 등록'>+ 등록</button>
+            <button type='button' onClick={() => openEditor('create')} disabled={Boolean(magazine)} title={magazine ? '이 활동·기수에는 이미 매거진이 있습니다. 수정하거나 삭제해 주세요.' : '새 매거진 등록'} className='inline-flex h-8 items-center rounded-full px-2 text-sm font-medium text-white/40 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60 disabled:cursor-not-allowed disabled:text-white/15 disabled:hover:text-white/15' aria-label='매거진 등록'>+ 등록</button>
             {magazine && <button type='button' onClick={() => openEditor('edit')} className='inline-flex h-8 items-center rounded-full px-2 text-sm font-medium text-white/40 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60' aria-label='현재 매거진 수정'>수정</button>}
           </div></div>
           <div className='mt-5 border-t border-white/25' />
@@ -107,6 +121,8 @@ export default function Activities() {
       </section>
     </main>
     <div className='relative z-20 w-full px-4 pb-3'><Footer /></div>
-    {editorMode && <MagazineEditorModal initialActivity={ACTIVITY_TYPES[selectedActivity]} initialGeneration={selectedGeneration} initialMagazine={editorMode === 'edit' ? magazine : null} onClose={() => setEditorMode(null)} onSaved={handleSaved} />}
+    {editorMode && <Suspense fallback={<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 text-sm text-white/70'>편집기를 불러오는 중…</div>}>
+      <MagazineEditorModal initialActivity={ACTIVITY_TYPES[selectedActivity]} initialGeneration={selectedGeneration} initialMagazine={editorMode === 'edit' ? magazine : null} onClose={() => setEditorMode(null)} onSaved={handleSaved} onDeleted={handleDeleted} />
+    </Suspense>}
   </div>
 }

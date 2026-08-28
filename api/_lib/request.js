@@ -6,9 +6,10 @@ export function sendJson(response, status, body) {
   response.status(status).json(body);
 }
 
-export function requireMethod(request, response, method) {
-  if (request.method === method) return true;
-  response.setHeader('Allow', method);
+export function requireMethod(request, response, methods) {
+  const allowed = Array.isArray(methods) ? methods : [methods];
+  if (allowed.includes(request.method)) return true;
+  response.setHeader('Allow', allowed.join(', '));
   sendJson(response, 405, { success: false, message: '허용되지 않은 요청 방식입니다.' });
   return false;
 }
