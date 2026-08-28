@@ -13,15 +13,31 @@ const createId = () =>
 const createTextBlock = () => ({ id: createId(), type: 'text', text: '', style: 'paragraph' })
 const createImageBlock = () => ({ id: createId(), type: 'image', url: '', caption: '', width: 'full' })
 
-export default function MagazineEditorModal({ initialActivity, initialGeneration, onClose, onSaved }) {
+/**
+ * 저장된 매거진 블록에는 편집용 id가 없을 수 있으므로 채워 넣고,
+ * 누락된 필드는 기본값으로 메워 제어 컴포넌트가 깨지지 않게 한다.
+ */
+const hydrateBlocks = (blocks) => {
+  if (!Array.isArray(blocks) || blocks.length === 0) return [createTextBlock()]
+  return blocks.map((block) => (block.type === 'image'
+    ? { ...block, id: block.id || createId(), url: block.url ?? '', caption: block.caption ?? '', width: block.width ?? 'full' }
+    : { ...block, id: block.id || createId(), type: 'text', text: block.text ?? '', style: block.style ?? 'paragraph' }))
+}
+
+export default function MagazineEditorModal({ initialActivity, initialGeneration, initialMagazine, onClose, onSaved }) {
+  const isEditing = Boolean(initialMagazine)
   const [activityType, setActivityType] = useState(initialActivity)
   const [generation, setGeneration] = useState(initialGeneration)
-  const [title, setTitle] = useState('')
-  const [blocks, setBlocks] = useState([createTextBlock()])
+  const [title, setTitle] = useState(initialMagazine?.title ?? '')
+  const [blocks, setBlocks] = useState(() => hydrateBlocks(initialMagazine?.blocks))
   const [passphrase, setPassphrase] = useState('')
   const [uploadingId, setUploadingId] = useState(null)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  // 수정 중에 대상을 옮기면 원본이 남은 채 새 항목이 생기므로 미리 알린다.
+  const movedTarget = isEditing
+    && (activityType !== initialActivity || Number(generation) !== Number(initialGeneration))
 
   const updateBlock = (id, updates) => {
     setBlocks((current) => current.map((block) => (block.id === id ? { ...block, ...updates } : block)))
@@ -93,7 +109,7 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4' role='dialog' aria-modal='true' aria-labelledby='magazine-editor-title'>
       <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-2xl border border-white/20 bg-[#191c20] p-5 text-white shadow-2xl md:p-8'>
         <div className='flex items-center justify-between gap-4'>
-          <h2 id='magazine-editor-title' className='text-xl font-semibold md:text-2xl'>매거진 등록</h2>
+          <h2 id='magazine-editor-title' className='text-xl font-semibold md:text-2xl'>{isEditing ? '매거진 수정' : '매거진 등록'}</h2>
           <button type='button' onClick={onClose} className='text-2xl text-white/70 hover:text-white' aria-label='모달 닫기'>×</button>
         </div>
 
@@ -107,6 +123,8 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
             <input type='number' min='1' value={generation} onChange={(event) => setGeneration(event.target.value)} className='mt-2 w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-white' />
           </label>
         </div>
+
+        {movedTarget && <p className='mt-3 text-sm text-orange-200'>활동이나 기수를 바꾸면 원래 매거진은 그대로 남고, 새 매거진으로 등록됩니다.</p>}
 
         <label className='mt-4 block text-sm'>제목
           <input value={title} onChange={(event) => setTitle(event.target.value)} placeholder='매거진 제목' className='mt-2 w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-white placeholder:text-white/40' />

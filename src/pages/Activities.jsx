@@ -43,7 +43,8 @@ export default function Activities() {
   const navigate = useNavigate()
   const [selectedActivity, setSelectedActivity] = useState('hackathon')
   const [selectedGeneration, setSelectedGeneration] = useState(14)
-  const [isEditorOpen, setIsEditorOpen] = useState(false)
+  // null이면 닫힘, 'create'는 새 매거진, 'edit'은 현재 보고 있는 매거진 수정.
+  const [editorMode, setEditorMode] = useState(null)
   const [savedNotice, setSavedNotice] = useState('')
 
   useEffect(() => { loadFonts() }, [])
@@ -64,11 +65,12 @@ export default function Activities() {
   const handleCardKeyDown = (event, cardId) => {
     if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectCard(cardId) }
   }
+  const openEditor = (mode) => { setSavedNotice(''); setEditorMode(mode) }
   const handleSaved = ({ activityType, generation }) => {
     const activityId = Object.entries(ACTIVITY_TYPES).find(([, type]) => type === activityType)?.[0]
     if (activityId) setSelectedActivity(activityId)
     setSelectedGeneration(generation)
-    setIsEditorOpen(false)
+    setEditorMode(null)
     setSavedNotice('저장되었습니다. 배포가 반영되기까지 1분 정도 걸릴 수 있습니다.')
   }
 
@@ -79,7 +81,7 @@ export default function Activities() {
       <section className='relative mx-auto max-w-[1360px] overflow-x-hidden'>
         <img src={dottedCircle} alt='' width='1445' height='1114' loading='eager' decoding='async' className='pointer-events-none absolute left-1/2 top-[28%] w-[860px] max-w-[72vw] -translate-x-1/2 -translate-y-1/2 opacity-85' />
         <h1 className='text-center text-[14px] font-semibold tracking-tight md:text-[20px]'>광운대 멋쟁이사자처럼의 활동을 소개합니다.</h1>
-        <div className='mt-10 grid grid-cols-1 gap-[30px] sm:grid-cols-2 sm:gap-5 lg:mt-8 lg:grid-cols-4 lg:gap-0.5'>
+        <div className='mb-[30px] mt-10 grid grid-cols-1 gap-[30px] sm:grid-cols-2 sm:gap-5 lg:mt-8 lg:grid-cols-4 lg:gap-0.5'>
           {activityCards.map((card) => {
             const selected = card.id === selectedActivity
             return <article key={card.id} role='button' tabIndex={0} onClick={() => selectCard(card.id)} onKeyDown={(event) => handleCardKeyDown(event, card.id)} className={`group relative mx-auto flex h-[136px] w-full max-w-[268px] cursor-pointer flex-row items-center gap-4 overflow-hidden rounded-[16px] border bg-white/[0.22] px-5 py-4 transition sm:h-[500px] sm:flex-col sm:items-center sm:rounded-[30px] sm:px-6 sm:pb-8 sm:pt-10 lg:h-[420px] lg:max-w-[276px] ${selected ? 'border-orange-300 shadow-[0_0_20px_rgba(255,153,102,0.3)]' : 'border-white/85'} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-orange-300`} aria-label={card.id === 'project' ? '프로젝트 페이지로 이동' : `${card.title} 매거진 보기`}>
@@ -93,7 +95,10 @@ export default function Activities() {
           <div className='flex items-center justify-between gap-4'><div className='flex gap-2'>{GENERATIONS.map((generation) => {
             const active = generation === selectedGeneration
             return <button key={generation} type='button' onClick={() => selectGeneration(generation)} className={`inline-flex h-10 min-w-12 items-center justify-center rounded-full border px-4 text-sm font-semibold transition ${active ? 'border-orange-300 bg-white text-orange-500 shadow-[0_0_16px_rgba(255,153,102,0.35)]' : 'border-white/35 bg-transparent text-white hover:border-white/70'}`}>{generation}th</button>
-          })}</div><button type='button' onClick={() => setIsEditorOpen(true)} className='inline-flex h-10 items-center gap-1 rounded-full border border-orange-300 bg-white px-4 text-sm font-semibold text-orange-500 transition hover:bg-orange-50' aria-label='매거진 등록'>+ 등록</button></div>
+          })}</div><div className='flex items-center gap-1'>
+            <button type='button' onClick={() => openEditor('create')} className='inline-flex h-8 items-center rounded-full px-2 text-sm font-medium text-white/40 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60' aria-label='매거진 등록'>+ 등록</button>
+            {magazine && <button type='button' onClick={() => openEditor('edit')} className='inline-flex h-8 items-center rounded-full px-2 text-sm font-medium text-white/40 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60' aria-label='현재 매거진 수정'>수정</button>}
+          </div></div>
           <div className='mt-5 border-t border-white/25' />
           {savedNotice && <div role='status' className='mt-5 rounded-lg border border-orange-300/60 bg-orange-300/10 px-4 py-3 text-sm text-orange-200'>{savedNotice}</div>}
           {!magazine && <div className='py-12 text-center text-white/65'>등록된 매거진이 없습니다.</div>}
@@ -102,6 +107,6 @@ export default function Activities() {
       </section>
     </main>
     <div className='relative z-20 w-full px-4 pb-3'><Footer /></div>
-    {isEditorOpen && <MagazineEditorModal initialActivity={ACTIVITY_TYPES[selectedActivity]} initialGeneration={selectedGeneration} onClose={() => setIsEditorOpen(false)} onSaved={handleSaved} />}
+    {editorMode && <MagazineEditorModal initialActivity={ACTIVITY_TYPES[selectedActivity]} initialGeneration={selectedGeneration} initialMagazine={editorMode === 'edit' ? magazine : null} onClose={() => setEditorMode(null)} onSaved={handleSaved} />}
   </div>
 }
