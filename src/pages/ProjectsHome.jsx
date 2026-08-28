@@ -237,6 +237,9 @@ export default function ProjectsHome() {
             left: 0,
             right: 0,
             width: '100%',
+            // Keep the layer at least as tall as the image rendered at its
+            // natural 1728:461 aspect ratio, so wide viewports cannot crop it.
+            aspectRatio: '1728 / 461',
             minHeight: '400px',
             zIndex: 0,
           }}
