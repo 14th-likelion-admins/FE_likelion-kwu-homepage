@@ -81,7 +81,7 @@ export default function Activities() {
       <section className='relative mx-auto max-w-[1360px] overflow-x-hidden'>
         <img src={dottedCircle} alt='' width='1445' height='1114' loading='eager' decoding='async' className='pointer-events-none absolute left-1/2 top-[28%] w-[860px] max-w-[72vw] -translate-x-1/2 -translate-y-1/2 opacity-85' />
         <h1 className='text-center text-[14px] font-semibold tracking-tight md:text-[20px]'>광운대 멋쟁이사자처럼의 활동을 소개합니다.</h1>
-        <div className='mt-10 grid grid-cols-1 gap-[30px] sm:grid-cols-2 sm:gap-5 lg:mt-8 lg:grid-cols-4 lg:gap-0.5'>
+        <div className='mb-[30px] mt-10 grid grid-cols-1 gap-[30px] sm:grid-cols-2 sm:gap-5 lg:mt-8 lg:grid-cols-4 lg:gap-0.5'>
           {activityCards.map((card) => {
             const selected = card.id === selectedActivity
             return <article key={card.id} role='button' tabIndex={0} onClick={() => selectCard(card.id)} onKeyDown={(event) => handleCardKeyDown(event, card.id)} className={`group relative mx-auto flex h-[136px] w-full max-w-[268px] cursor-pointer flex-row items-center gap-4 overflow-hidden rounded-[16px] border bg-white/[0.22] px-5 py-4 transition sm:h-[500px] sm:flex-col sm:items-center sm:rounded-[30px] sm:px-6 sm:pb-8 sm:pt-10 lg:h-[420px] lg:max-w-[276px] ${selected ? 'border-orange-300 shadow-[0_0_20px_rgba(255,153,102,0.3)]' : 'border-white/85'} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-orange-300`} aria-label={card.id === 'project' ? '프로젝트 페이지로 이동' : `${card.title} 매거진 보기`}>
