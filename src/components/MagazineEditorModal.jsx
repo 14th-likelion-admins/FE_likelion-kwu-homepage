@@ -166,6 +166,19 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
     if (passphrase.trim()) uploadItemImage(itemId, file).catch(() => {})
   }
 
+  /**
+   * 암호가 틀려 업로드가 실패하면 블록에 오류가 남는데, 암호를 고쳐도 그 문구가
+   * 그대로 붙어 있어 계속 틀린 것처럼 보였다. 암호를 건드리면 지난 실패를 지운다.
+   */
+  const changePassphrase = (value) => {
+    setPassphrase(value)
+    setError('')
+    setRows((current) => current.map((row) => ({
+      ...row,
+      items: row.items.map((item) => (item.uploadError ? { ...item, uploadError: '' } : item)),
+    })))
+  }
+
   const actions = {
     update: (itemId, updates) => setRows((current) => updateItem(current, itemId, updates)),
     remove: (itemId) => setRows((current) => removeItem(current, itemId)),
@@ -237,6 +250,8 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
   }
 
   const dragging = Boolean(draggingId)
+  // 한/영 전환을 깜빡하고 친 경우를 바로 알아채도록 한다. 완성형·자모·호환자모 모두 잡는다.
+  const hasHangul = /[ᄀ-ᇿ㄰-㆏가-힯]/.test(passphrase)
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4' role='dialog' aria-modal='true' aria-labelledby='magazine-editor-title'>
@@ -264,8 +279,9 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
         </label>
 
         <label className='mt-4 block text-sm'>운영진 암호
-          <input type='password' value={passphrase} onChange={(event) => setPassphrase(event.target.value)} placeholder='운영진끼리 공유한 암호' className='mt-2 w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-white placeholder:text-white/40' />
+          <input type='password' value={passphrase} onChange={(event) => changePassphrase(event.target.value)} placeholder='운영진끼리 공유한 암호' className='mt-2 w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-white placeholder:text-white/40' />
         </label>
+        {hasHangul && <p className='mt-2 text-sm text-orange-200'>암호에 한글이 섞여 있습니다. 한/영 키를 확인해 주세요.</p>}
 
         <p className='mt-6 text-sm text-white/55'>
           ⠿ 손잡이를 끌어 옮깁니다. 블록 <span className='text-white/80'>옆</span>에 놓으면 같은 줄에 나란히, 줄 <span className='text-white/80'>사이</span>에 놓으면 새 줄이 됩니다.
