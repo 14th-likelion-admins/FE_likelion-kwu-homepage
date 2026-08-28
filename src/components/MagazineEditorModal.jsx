@@ -57,22 +57,40 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
     })
   }
 
-  const handleImageUpload = async (blockId, file) => {
-    if (!file) return
-    if (!passphrase.trim()) {
-      setError('운영진 암호를 입력해 주세요.')
-      return
-    }
-    setError('')
+  const uploadMessage = (uploadError) => (uploadError.status === 401
+    ? '운영진 암호가 올바르지 않습니다.'
+    : uploadError.message || '이미지 업로드에 실패했습니다.')
+
+  const uploadBlockImage = async (blockId, file) => {
     setUploadingId(blockId)
     try {
       const url = await uploadImage(file, 'magazines', passphrase)
-      updateBlock(blockId, { url })
+      updateBlock(blockId, { url, uploadError: '' })
+      return url
     } catch (uploadError) {
-      setError(uploadError.status === 401 ? '운영진 암호가 올바르지 않습니다.' : uploadError.message || '이미지 업로드에 실패했습니다.')
+      updateBlock(blockId, { uploadError: uploadMessage(uploadError) })
+      throw uploadError
     } finally {
       setUploadingId(null)
     }
+  }
+
+  /**
+   * 파일을 고른 시점에 암호가 없으면 블록에 들고만 있다가 저장할 때 올린다.
+   * 예전에는 여기서 곧장 거절해서, 암호를 나중에 입력하면 파일이 붙은 것처럼
+   * 보이는데도 저장이 막히고 같은 파일은 재선택해도 change 이벤트가 없어
+   * 되돌릴 방법이 없었다.
+   */
+  const handleImageSelect = (blockId, file, input) => {
+    if (input) input.value = ''
+    if (!file) return
+    const previewUrl = URL.createObjectURL(file)
+    setBlocks((current) => current.map((block) => {
+      if (block.id !== blockId) return block
+      if (block.previewUrl) URL.revokeObjectURL(block.previewUrl)
+      return { ...block, file, previewUrl, url: '', uploadError: '' }
+    }))
+    if (passphrase.trim()) uploadBlockImage(blockId, file).catch(() => {})
   }
 
   const handleSave = async () => {
@@ -84,19 +102,34 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
       setError('올바른 기수를 입력해 주세요.')
       return
     }
-    if (blocks.some((block) => block.type === 'image' && !block.url)) {
-      setError('이미지 블록의 파일을 업로드해 주세요.')
-      return
-    }
     if (!passphrase.trim()) {
       setError('운영진 암호를 입력해 주세요.')
+      return
+    }
+    if (blocks.some((block) => block.type === 'image' && !block.url && !block.file)) {
+      setError('이미지 블록의 파일을 선택해 주세요.')
       return
     }
 
     setSaving(true)
     setError('')
     try {
-      await saveMagazine(activityType, Number(generation), { title: title.trim(), blocks }, passphrase)
+      // 암호를 파일 선택보다 나중에 입력했거나 앞선 업로드가 실패한 이미지를 여기서 올린다.
+      const settled = []
+      for (const block of blocks) {
+        if (block.type === 'image' && !block.url && block.file) {
+          settled.push({ ...block, url: await uploadBlockImage(block.id, block.file) })
+        } else {
+          settled.push(block)
+        }
+      }
+      setBlocks(settled)
+
+      // File·objectURL·업로드 오류는 편집 중에만 쓰는 값이라, 저장할 필드만 골라 담는다.
+      const payload = settled.map((block) => (block.type === 'image'
+        ? { id: block.id, type: 'image', url: block.url, caption: block.caption, width: block.width }
+        : { id: block.id, type: 'text', text: block.text, style: block.style }))
+      await saveMagazine(activityType, Number(generation), { title: title.trim(), blocks: payload }, passphrase)
       onSaved({ activityType, generation: Number(generation) })
     } catch (saveError) {
       setError(saveError.status === 401 ? '운영진 암호가 올바르지 않습니다.' : saveError.message || '매거진 저장에 실패했습니다.')
@@ -154,9 +187,11 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
                 </>
               ) : (
                 <div className='space-y-3'>
-                  <input type='file' accept='image/*' onChange={(event) => handleImageUpload(block.id, event.target.files?.[0])} disabled={uploadingId === block.id} className='block w-full text-sm text-white/75 file:mr-3 file:rounded file:border-0 file:bg-orange-300 file:px-3 file:py-1 file:text-[#111315]' />
+                  <input type='file' accept='image/*' onChange={(event) => handleImageSelect(block.id, event.target.files?.[0], event.target)} disabled={uploadingId === block.id} className='block w-full text-sm text-white/75 file:mr-3 file:rounded file:border-0 file:bg-orange-300 file:px-3 file:py-1 file:text-[#111315]' />
                   {uploadingId === block.id && <p className='text-sm text-orange-200'>이미지를 업로드하고 있습니다…</p>}
-                  {block.url && <img src={block.url} alt='업로드 미리보기' loading='lazy' decoding='async' className='max-h-56 rounded-lg object-contain' />}
+                  {block.uploadError && <p role='alert' className='text-sm text-red-300'>{block.uploadError}</p>}
+                  {!block.url && block.file && uploadingId !== block.id && !block.uploadError && <p className='text-sm text-white/60'>저장할 때 함께 업로드됩니다.</p>}
+                  {(block.url || block.previewUrl) && <img src={block.url || block.previewUrl} alt='업로드 미리보기' loading='lazy' decoding='async' className='max-h-56 rounded-lg object-contain' />}
                   <input value={block.caption} onChange={(event) => updateBlock(block.id, { caption: event.target.value })} placeholder='이미지 설명 (선택)' className='w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-white placeholder:text-white/40' />
                   <select value={block.width} onChange={(event) => updateBlock(block.id, { width: event.target.value })} className='rounded border border-white/25 bg-[#191c20] px-2 py-1 text-sm'><option value='full'>전체 너비</option><option value='half'>반 너비</option></select>
                 </div>
