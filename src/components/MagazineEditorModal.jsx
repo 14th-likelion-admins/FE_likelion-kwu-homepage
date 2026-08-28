@@ -83,7 +83,7 @@ function ItemCard({ item, row, rowIndex, rowCount, uploadingId, actions }) {
           <select value={item.style} onChange={(event) => actions.update(item.id, { style: event.target.value })} className='mb-3 rounded border border-white/25 bg-[#191c20] px-2 py-1 text-sm'>
             <option value='paragraph'>문단</option><option value='heading'>제목</option>
           </select>
-          <textarea value={item.text} onChange={(event) => actions.update(item.id, { text: event.target.value })} placeholder='내용을 입력하세요.' rows='4' className='w-full resize-y rounded-lg border border-white/25 bg-white/10 p-3 text-white placeholder:text-white/40' />
+          <textarea value={item.text} onChange={(event) => actions.update(item.id, { text: event.target.value })} placeholder='내용을 입력하세요. 마크다운을 쓸 수 있어요: **굵게**, *기울임*, [링크](https://...), - 목록' rows='4' className='w-full resize-y rounded-lg border border-white/25 bg-white/10 p-3 text-white placeholder:text-white/40' />
         </>
       ) : (
         <div className='space-y-3'>
