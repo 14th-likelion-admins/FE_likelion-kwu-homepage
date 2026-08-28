@@ -1,6 +1,6 @@
 // src/components/Footer.jsx
-import email from '../assets/email-icon.png'
-import insta from '../assets/insta-icon.png'
+import email from '../assets/email-icon.webp'
+import insta from '../assets/insta-icon.webp'
 import { LINKS } from '../utils/links'
 
 export default function Footer() {

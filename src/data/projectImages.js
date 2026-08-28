@@ -17,52 +17,52 @@
 // 프로젝트 메인 이미지 Import
 // ============================================================================
 // 형식: projects-image-{번호}.{확장자}
-// 확장자: .png, .jpg, .jpeg 지원
+// 확장자: .webp
 // 현재 프로젝트: 1-17번 (총 17개)
 // ============================================================================
-import projectImage1 from '../assets/projects-image-1.png'
-import projectImage2 from '../assets/projects-image-2.png'
-import projectImage3 from '../assets/projects-image-3.png'
-import projectImage4 from '../assets/projects-image-4.png'
-import projectImage5 from '../assets/projects-image-5.png'
-import projectImage6 from '../assets/projects-image-6.png'
-import projectImage7 from '../assets/projects-image-7.png'
-import projectImage8 from '../assets/projects-image-8.png'
-import projectImage9 from '../assets/projects-image-9.png'
-import projectImage10 from '../assets/projects-image-10.jpg'
-import projectImage11 from '../assets/projects-image-11.png'
-import projectImage12 from '../assets/projects-image-12.jpeg'
-import projectImage13 from '../assets/projects-image-13.png'
-import projectImage14 from '../assets/projects-image-14.png'
-import projectImage15 from '../assets/projects-image-15.png'
-import projectImage16 from '../assets/projects-image-16.png'
-import projectImage17 from '../assets/projects-image-17.png'
+import projectImage1 from '../assets/projects-image-1.webp'
+import projectImage2 from '../assets/projects-image-2.webp'
+import projectImage3 from '../assets/projects-image-3.webp'
+import projectImage4 from '../assets/projects-image-4.webp'
+import projectImage5 from '../assets/projects-image-5.webp'
+import projectImage6 from '../assets/projects-image-6.webp'
+import projectImage7 from '../assets/projects-image-7.webp'
+import projectImage8 from '../assets/projects-image-8.webp'
+import projectImage9 from '../assets/projects-image-9.webp'
+import projectImage10 from '../assets/projects-image-10.webp'
+import projectImage11 from '../assets/projects-image-11.webp'
+import projectImage12 from '../assets/projects-image-12.webp'
+import projectImage13 from '../assets/projects-image-13.webp'
+import projectImage14 from '../assets/projects-image-14.webp'
+import projectImage15 from '../assets/projects-image-15.webp'
+import projectImage16 from '../assets/projects-image-16.webp'
+import projectImage17 from '../assets/projects-image-17.webp'
 // 새로운 프로젝트 이미지 추가 시 위에 import 문 추가
 
 // ============================================================================
 // 프로젝트 썸네일 이미지 Import
 // ============================================================================
-// 형식: projects-thumbnail-{번호}.png
+// 형식: projects-thumbnail-{번호}.webp
 // 주의: 썸네일이 없어도 동작하지만, 있으면 ProjectsHome에서 사용됩니다.
 // 현재 프로젝트: 1-17번 (총 17개)
 // ============================================================================
-import projectThumbnail1 from '../assets/projects-thumbnail-1.png'
-import projectThumbnail2 from '../assets/projects-thumbnail-2.png'
-import projectThumbnail3 from '../assets/projects-thumbnail-3.png'
-import projectThumbnail4 from '../assets/projects-thumbnail-4.png'
-import projectThumbnail5 from '../assets/projects-thumbnail-5.png'
-import projectThumbnail6 from '../assets/projects-thumbnail-6.png'
-import projectThumbnail7 from '../assets/projects-thumbnail-7.png'
-import projectThumbnail8 from '../assets/projects-thumbnail-8.png'
-import projectThumbnail9 from '../assets/projects-thumbnail-9.png'
-import projectThumbnail10 from '../assets/projects-thumbnail-10.png'
-import projectThumbnail11 from '../assets/projects-thumbnail-11.png'
-import projectThumbnail12 from '../assets/projects-thumbnail-12.png'
-import projectThumbnail13 from '../assets/projects-thumbnail-13.png'
-import projectThumbnail14 from '../assets/projects-thumbnail-14.png'
-import projectThumbnail15 from '../assets/projects-thumbnail-15.png'
-import projectThumbnail16 from '../assets/projects-thumbnail-16.png'
-import projectThumbnail17 from '../assets/projects-thumbnail-17.png'
+import projectThumbnail1 from '../assets/projects-thumbnail-1.webp'
+import projectThumbnail2 from '../assets/projects-thumbnail-2.webp'
+import projectThumbnail3 from '../assets/projects-thumbnail-3.webp'
+import projectThumbnail4 from '../assets/projects-thumbnail-4.webp'
+import projectThumbnail5 from '../assets/projects-thumbnail-5.webp'
+import projectThumbnail6 from '../assets/projects-thumbnail-6.webp'
+import projectThumbnail7 from '../assets/projects-thumbnail-7.webp'
+import projectThumbnail8 from '../assets/projects-thumbnail-8.webp'
+import projectThumbnail9 from '../assets/projects-thumbnail-9.webp'
+import projectThumbnail10 from '../assets/projects-thumbnail-10.webp'
+import projectThumbnail11 from '../assets/projects-thumbnail-11.webp'
+import projectThumbnail12 from '../assets/projects-thumbnail-12.webp'
+import projectThumbnail13 from '../assets/projects-thumbnail-13.webp'
+import projectThumbnail14 from '../assets/projects-thumbnail-14.webp'
+import projectThumbnail15 from '../assets/projects-thumbnail-15.webp'
+import projectThumbnail16 from '../assets/projects-thumbnail-16.webp'
+import projectThumbnail17 from '../assets/projects-thumbnail-17.webp'
 // 새로운 프로젝트 썸네일 추가 시 위에 import 문 추가
 
 // ============================================================================

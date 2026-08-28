@@ -1,6 +1,6 @@
-import feLogo from '../assets/curriculum/fe_logo.png'
-import beLogo from '../assets/curriculum/be_logo.png'
-import deLogo from '../assets/curriculum/de_logo.png'
+import feLogo from '../assets/curriculum/fe_logo.webp'
+import beLogo from '../assets/curriculum/be_logo.webp'
+import deLogo from '../assets/curriculum/de_logo.webp'
 
 export const curriculumData = {
   backend: {

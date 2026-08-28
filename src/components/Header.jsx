@@ -1,7 +1,7 @@
 // src/components/Header.jsx
 import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
-import logo from '../assets/kw-logo.png'
+import logo from '../assets/kw-logo.webp'
 
 export default function Header() {
   const [aboutOpen, setAboutOpen] = useState(false)

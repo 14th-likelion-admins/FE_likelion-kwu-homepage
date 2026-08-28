@@ -22,7 +22,7 @@ const phaseOneSources = new Set([
   'src/assets/gradiant-bg.png',
 ])
 
-const pngExceptions = new Set(['public/thumbnail.png', 'public/kw-logo.png'])
+const rasterExceptions = new Set(['public/thumbnail.png', 'public/thumbnail.jpg', 'public/kw-logo.png'])
 
 function toPosix(relativePath) {
   return relativePath.split(path.sep).join('/')
@@ -118,19 +118,19 @@ async function createBeforeReport() {
 }
 
 async function optimizeThumbnail(filePath) {
-  const temporaryPath = `${filePath}.optimized.png`
-  const metadata = await sharp(filePath).metadata()
+  const optimized = await sharp(filePath)
+    .resize({
+      width: 1200,
+      height: 630,
+      fit: 'contain',
+      background: { r: 0, g: 0, b: 0, alpha: 1 },
+      withoutEnlargement: true,
+    })
+    .flatten({ background: '#000' })
+    .jpeg({ quality: 85, mozjpeg: true })
+    .toBuffer()
 
-  if (metadata.width / metadata.height !== 1200 / 630) {
-    throw new Error(`public/thumbnail.png must already have a 1200:630 aspect ratio; found ${metadata.width}x${metadata.height}`)
-  }
-
-  await sharp(filePath)
-    .resize({ width: 1200, height: 630, fit: 'inside', withoutEnlargement: true })
-    .png({ compressionLevel: 9, adaptiveFiltering: true })
-    .toFile(temporaryPath)
-
-  return { temporaryPath, outputPath: filePath }
+  await writeFile(filePath.replace(/\.png$/i, '.jpg'), optimized)
 }
 
 async function optimizeRaster(filePath) {
@@ -157,7 +157,7 @@ async function optimizeAll() {
   for (const filePath of candidates) {
     const relativePath = relativeToRepository(filePath)
 
-    if (phaseOneSources.has(relativePath) || pngExceptions.has(relativePath)) {
+    if (phaseOneSources.has(relativePath) || rasterExceptions.has(relativePath)) {
       skipped += 1
       continue
     }
@@ -168,12 +168,10 @@ async function optimizeAll() {
   }
 
   const thumbnailPath = path.join(repositoryRoot, 'public', 'thumbnail.png')
-  const { temporaryPath, outputPath } = await optimizeThumbnail(thumbnailPath)
-  const { rename } = await import('node:fs/promises')
-  await rename(temporaryPath, outputPath)
+  await optimizeThumbnail(thumbnailPath)
 
   console.log(`Converted ${converted} raster images; skipped ${skipped} protected or Phase 1 images.`)
-  console.log('Optimized public/thumbnail.png as a PNG exception.')
+  console.log('Optimized public/thumbnail.png as an SNS-compatible JPEG exception.')
 }
 
 const command = process.argv[2]
