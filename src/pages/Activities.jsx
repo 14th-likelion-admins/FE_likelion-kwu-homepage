@@ -53,9 +53,11 @@ function MagazineContent({ magazine }) {
   return <article className='py-8 md:py-10'>
     <h2 className='text-2xl font-semibold md:text-4xl'>{magazine.title}</h2>
     {rows.length === 0 ? <p className='mt-6 text-white/70'>등록된 본문이 없습니다.</p> : <div className='mt-7 space-y-6 md:mt-10 md:space-y-8'>
-      {rows.map((row) => <div key={row.id} className='flex flex-col gap-5 md:flex-row md:items-start md:gap-6'>
+      {rows.map((row) => <div key={row.id} className='flex flex-col gap-5 md:flex-row md:items-start md:justify-between md:gap-12'>
         {/* flex-1은 md 이상에서만. 모바일은 flex-col이라 flex-basis:0이 높이에 걸려 행이 접힌다. */}
         {/* 사진이 다른 항목과 나란히 놓이거나(좌/우 배치) 절반 너비로 지정되면, 페이지 전체 폭의 1/3로 좁힌다. */}
+        {/* justify-between: 사진 두 장처럼 항목 너비 합이 행보다 좁을 때, 남는 공간을 항목 사이로 몰아서
+            양쪽 끝(좌/우)에 딱 붙게 만든다. flex-1 항목이 있으면 이미 끝까지 채우므로 영향이 없다. */}
         {row.items.map((item) => {
           const sideBySide = row.items.length > 1
           const narrowImage = item.type === 'image' && (sideBySide || item.width === 'half')
