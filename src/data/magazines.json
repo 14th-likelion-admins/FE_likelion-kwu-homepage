@@ -44,7 +44,7 @@
               "id": "ae73e3d1-8e90-46a6-a051-6838388328ce",
               "type": "image",
               "url": "/uploads/magazines/6792ec30-e89d-4d71-b440-58eec1e950a6.webp",
-              "caption": "",
+              "caption": "이미지 설명 22",
               "width": "full",
               "pixelWidth": 1415,
               "pixelHeight": 1111
@@ -53,7 +53,7 @@
               "id": "8867dcfc-32d9-47de-bfc9-d016b7123eb3",
               "type": "image",
               "url": "/uploads/magazines/6b7fd247-800d-4f00-97ca-f9c39f4cf7df.webp",
-              "caption": "",
+              "caption": "이미지 설명 22",
               "width": "full",
               "pixelWidth": 1415,
               "pixelHeight": 1112
@@ -69,6 +69,102 @@
               "type": "text",
               "text": "마무리 한 줄 ",
               "style": "paragraph"
+            }
+          ]
+        },
+        {
+          "id": "d2490416-e714-407a-bab9-9015243574c8",
+          "type": "row",
+          "items": [
+            {
+              "id": "58beabda-b20c-4fbd-833c-558aae8a7a39",
+              "type": "image",
+              "url": "/uploads/magazines/e784444f-e9e0-4dd5-b228-03d17d87a0e1.webp",
+              "caption": "이미지 설명 11",
+              "width": "full",
+              "pixelWidth": 1600,
+              "pixelHeight": 1200
+            }
+          ]
+        },
+        {
+          "id": "1e56225f-55f5-4496-9731-fa4229dfd40e",
+          "type": "row",
+          "items": [
+            {
+              "id": "aad3e9d4-2735-4d06-b2aa-1f83d67d8839",
+              "type": "text",
+              "text": "===============================================================================================",
+              "style": "paragraph"
+            }
+          ]
+        },
+        {
+          "id": "f7dc4d9d-5926-409b-be70-d554af585d33",
+          "type": "row",
+          "items": [
+            {
+              "id": "555e3e29-c415-468b-847a-6f683e7f42c3",
+              "type": "image",
+              "url": "/uploads/magazines/db05c778-2c0b-4da7-9aa0-8259574f2f45.webp",
+              "caption": "",
+              "width": "full",
+              "pixelWidth": 1600,
+              "pixelHeight": 2133
+            },
+            {
+              "id": "555a52e9-dd93-4084-8764-a115133e91e4",
+              "type": "text",
+              "text": "텍스트",
+              "style": "paragraph"
+            }
+          ]
+        },
+        {
+          "id": "b6e9eea8-683e-4744-87a4-3807c8968867",
+          "type": "row",
+          "items": [
+            {
+              "id": "25f56e84-cf4e-468f-b20f-e7433216f9c2",
+              "type": "image",
+              "url": "/uploads/magazines/9998025b-8c68-4166-b051-64214a86887f.webp",
+              "caption": "",
+              "width": "full",
+              "pixelWidth": 1600,
+              "pixelHeight": 2133
+            },
+            {
+              "id": "91d2bb5a-e79c-43d8-9b87-62067c14f426",
+              "type": "image",
+              "url": "/uploads/magazines/969c35eb-8944-4a73-9b2c-92aa72ca7d30.webp",
+              "caption": "",
+              "width": "full",
+              "pixelWidth": 1600,
+              "pixelHeight": 2133
+            }
+          ]
+        },
+        {
+          "id": "4336736d-1150-4c99-b805-c1dc0debf470",
+          "type": "row",
+          "items": [
+            {
+              "id": "7e352549-dade-4893-a076-f66db46d3503",
+              "type": "image",
+              "url": "/uploads/magazines/2d3559f8-d04f-4c50-842b-8d8012307fce.webp",
+              "caption": "",
+              "width": "full",
+              "pixelWidth": 1600,
+              "pixelHeight": 1067
+            },
+            {
+              "id": "2a2cd2b1-a52d-4f33-8596-43f04b551f00",
+              "type": "image",
+              "url": "/uploads/magazines/f0bc7715-5c6a-4753-8219-0d25d1eca42d.webp",
+              "caption": "",
+              "width": "full",
+              "pixelWidth": 1600,
+              "pixelHeight": 1067
             }
           ]
         }
