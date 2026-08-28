@@ -1,1 +1,15 @@
-{}
+{
+  "HACKATHON": {
+    "14": {
+      "title": "14기 중앙해커톤 초안!",
+      "blocks": [
+        {
+          "id": "4473b0d7-c94c-4107-a5de-abbd00e09ff5",
+          "type": "text",
+          "text": "초안!",
+          "style": "paragraph"
+        }
+      ]
+    }
+  }
+}
