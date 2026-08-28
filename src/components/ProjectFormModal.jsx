@@ -58,6 +58,7 @@ export default function ProjectFormModal({ isOpen, onClose, onCreated }) {
   const [features, setFeatures] = useState([''])
   const [images, setImages] = useState([])
   const [passphrase, setPassphrase] = useState('')
+  const [showPassphrase, setShowPassphrase] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
@@ -122,7 +123,7 @@ export default function ProjectFormModal({ isOpen, onClose, onCreated }) {
 
     newEntries.forEach((entry) => {
       uploadImage(entry.file, 'projects', passphrase)
-        .then((url) => {
+        .then(({ url }) => {
           setImages((prev) =>
             prev.map((img) =>
               img.localId === entry.localId ? { ...img, url, uploading: false } : img,
@@ -415,16 +416,35 @@ export default function ProjectFormModal({ isOpen, onClose, onCreated }) {
             )}
           </div>
 
+          {/*
+            type='password'였을 때 Chrome이 비밀번호 저장을 제안했다. 운영진끼리
+            공유하는 값이라 브라우저 자격증명으로 저장될 이유가 없어, 텍스트 입력에
+            -webkit-text-security로 가리고 보기 토글을 붙였다. 값이 있을 때만 가려서
+            placeholder는 그대로 읽히게 한다.
+          */}
           <div>
             <label className='mb-1 block text-sm text-white/70'>운영진 암호 *</label>
-            <input
-              type='password'
-              className={inputClassName}
-              value={passphrase}
-              onChange={(e) => setPassphrase(e.target.value)}
-              placeholder='운영진끼리 공유한 암호'
-              required
-            />
+            <div className='relative'>
+              <input
+                type='text'
+                className={`${inputClassName} pr-16 ${!showPassphrase && passphrase ? '[-webkit-text-security:disc]' : ''}`}
+                value={passphrase}
+                onChange={(e) => setPassphrase(e.target.value)}
+                placeholder='운영진끼리 공유한 암호'
+                name='content-write-key'
+                autoComplete='off'
+                autoCorrect='off'
+                autoCapitalize='off'
+                spellCheck='false'
+                data-lpignore='true'
+                data-1p-ignore=''
+                data-form-type='other'
+                required
+              />
+              <button type='button' onClick={() => setShowPassphrase((current) => !current)} className='absolute inset-y-0 right-2 my-auto h-7 rounded px-2 text-xs text-white/60 transition hover:bg-white/10 hover:text-white'>
+                {showPassphrase ? '숨기기' : '보기'}
+              </button>
+            </div>
           </div>
 
           {errorMessage && <p className='text-sm text-red-400'>{errorMessage}</p>}

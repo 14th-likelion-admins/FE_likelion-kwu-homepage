@@ -12,7 +12,9 @@
               "type": "image",
               "url": "/uploads/magazines/b3719998-205e-4cac-8930-a24533f40103.webp",
               "caption": "",
-              "width": "full"
+              "width": "full",
+              "pixelWidth": 1414,
+              "pixelHeight": 1112
             },
             {
               "id": "4473b0d7-c94c-4107-a5de-abbd00e09ff5",
@@ -43,14 +45,18 @@
               "type": "image",
               "url": "/uploads/magazines/6792ec30-e89d-4d71-b440-58eec1e950a6.webp",
               "caption": "",
-              "width": "full"
+              "width": "full",
+              "pixelWidth": 1415,
+              "pixelHeight": 1111
             },
             {
               "id": "8867dcfc-32d9-47de-bfc9-d016b7123eb3",
               "type": "image",
               "url": "/uploads/magazines/6b7fd247-800d-4f00-97ca-f9c39f4cf7df.webp",
               "caption": "",
-              "width": "full"
+              "width": "full",
+              "pixelWidth": 1415,
+              "pixelHeight": 1112
             }
           ]
         },

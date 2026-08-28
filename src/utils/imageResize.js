@@ -12,6 +12,8 @@ const renameToExtension = (filename, extension) => {
 /**
  * 업로드 전 이미지를 canvas로 리사이즈해서 용량을 줄인다.
  * 원본이 maxWidth보다 작으면 확대하지 않는다.
+ *
+ * @returns {Promise<{ file: File, width: number, height: number }>}
  */
 export function resizeImageFile(file, { maxWidth = MAX_WIDTH, quality = IMAGE_QUALITY } = {}) {
   return new Promise((resolve, reject) => {
@@ -38,7 +40,9 @@ export function resizeImageFile(file, { maxWidth = MAX_WIDTH, quality = IMAGE_QU
             reject(new Error('이미지를 처리하지 못했습니다.'))
             return
           }
-          resolve(new File([blob], renameToExtension(file.name, outputExtension), { type: outputMime }))
+          const resized = new File([blob], renameToExtension(file.name, outputExtension), { type: outputMime })
+          // 렌더러가 <img width height>로 고유 비율을 잡을 수 있도록 결과 크기를 함께 넘긴다.
+          resolve({ file: resized, width, height })
         },
         outputMime,
         quality,

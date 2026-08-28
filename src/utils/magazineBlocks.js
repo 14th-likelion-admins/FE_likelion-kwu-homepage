@@ -21,7 +21,18 @@ export const createRow = (items) => ({ id: createId(), type: 'row', items })
 
 /** 누락 필드를 기본값으로 메워 제어 컴포넌트가 깨지지 않게 한다. */
 const normalizeItem = (item) => (item?.type === 'image'
-  ? { ...item, id: item.id || createId(), type: 'image', url: item.url ?? '', caption: item.caption ?? '', width: item.width ?? 'full' }
+  // width는 레이아웃 폭('full'|'half'), pixelWidth/pixelHeight는 실제 픽셀 크기다.
+  // 픽셀 크기는 업로드 시점에만 알 수 있어, 예전에 올린 이미지에는 없다.
+  ? {
+    ...item,
+    id: item.id || createId(),
+    type: 'image',
+    url: item.url ?? '',
+    caption: item.caption ?? '',
+    width: item.width ?? 'full',
+    pixelWidth: Number(item.pixelWidth) || null,
+    pixelHeight: Number(item.pixelHeight) || null,
+  }
   : { ...item, id: item?.id || createId(), type: 'text', text: item?.text ?? '', style: item?.style ?? 'paragraph' })
 
 export function toRows(blocks) {
