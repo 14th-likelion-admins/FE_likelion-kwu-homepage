@@ -43,7 +43,8 @@ export default function Activities() {
   const navigate = useNavigate()
   const [selectedActivity, setSelectedActivity] = useState('hackathon')
   const [selectedGeneration, setSelectedGeneration] = useState(14)
-  const [isEditorOpen, setIsEditorOpen] = useState(false)
+  // null이면 닫힘, 'create'는 새 매거진, 'edit'은 현재 보고 있는 매거진 수정.
+  const [editorMode, setEditorMode] = useState(null)
   const [savedNotice, setSavedNotice] = useState('')
 
   useEffect(() => { loadFonts() }, [])
@@ -64,11 +65,12 @@ export default function Activities() {
   const handleCardKeyDown = (event, cardId) => {
     if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); selectCard(cardId) }
   }
+  const openEditor = (mode) => { setSavedNotice(''); setEditorMode(mode) }
   const handleSaved = ({ activityType, generation }) => {
     const activityId = Object.entries(ACTIVITY_TYPES).find(([, type]) => type === activityType)?.[0]
     if (activityId) setSelectedActivity(activityId)
     setSelectedGeneration(generation)
-    setIsEditorOpen(false)
+    setEditorMode(null)
     setSavedNotice('저장되었습니다. 배포가 반영되기까지 1분 정도 걸릴 수 있습니다.')
   }
 
@@ -93,7 +95,10 @@ export default function Activities() {
           <div className='flex items-center justify-between gap-4'><div className='flex gap-2'>{GENERATIONS.map((generation) => {
             const active = generation === selectedGeneration
             return <button key={generation} type='button' onClick={() => selectGeneration(generation)} className={`inline-flex h-10 min-w-12 items-center justify-center rounded-full border px-4 text-sm font-semibold transition ${active ? 'border-orange-300 bg-white text-orange-500 shadow-[0_0_16px_rgba(255,153,102,0.35)]' : 'border-white/35 bg-transparent text-white hover:border-white/70'}`}>{generation}th</button>
-          })}</div><button type='button' onClick={() => setIsEditorOpen(true)} className='inline-flex h-10 items-center gap-1 rounded-full border border-orange-300 bg-white px-4 text-sm font-semibold text-orange-500 transition hover:bg-orange-50' aria-label='매거진 등록'>+ 등록</button></div>
+          })}</div><div className='flex flex-col items-end gap-0.5'>
+            <button type='button' onClick={() => openEditor('create')} className='inline-flex h-8 items-center rounded-full px-2 text-sm font-medium text-white/40 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60' aria-label='매거진 등록'>+ 등록</button>
+            {magazine && <button type='button' onClick={() => openEditor('edit')} className='inline-flex h-8 items-center rounded-full px-2 text-sm font-medium text-white/40 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60' aria-label='현재 매거진 수정'>수정</button>}
+          </div></div>
           <div className='mt-5 border-t border-white/25' />
           {savedNotice && <div role='status' className='mt-5 rounded-lg border border-orange-300/60 bg-orange-300/10 px-4 py-3 text-sm text-orange-200'>{savedNotice}</div>}
           {!magazine && <div className='py-12 text-center text-white/65'>등록된 매거진이 없습니다.</div>}
@@ -102,6 +107,6 @@ export default function Activities() {
       </section>
     </main>
     <div className='relative z-20 w-full px-4 pb-3'><Footer /></div>
-    {isEditorOpen && <MagazineEditorModal initialActivity={ACTIVITY_TYPES[selectedActivity]} initialGeneration={selectedGeneration} onClose={() => setIsEditorOpen(false)} onSaved={handleSaved} />}
+    {editorMode && <MagazineEditorModal initialActivity={ACTIVITY_TYPES[selectedActivity]} initialGeneration={selectedGeneration} initialMagazine={editorMode === 'edit' ? magazine : null} onClose={() => setEditorMode(null)} onSaved={handleSaved} />}
   </div>
 }
