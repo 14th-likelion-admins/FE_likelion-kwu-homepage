@@ -1,4 +1,4 @@
-import { mkdir, readdir, stat, writeFile } from 'node:fs/promises'
+import { access, mkdir, readdir, stat, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -8,7 +8,8 @@ const scriptDirectory = path.dirname(fileURLToPath(import.meta.url))
 const repositoryRoot = path.resolve(scriptDirectory, '..')
 const assetRoots = [path.join(repositoryRoot, 'src', 'assets'), path.join(repositoryRoot, 'public')]
 const uploadsRoot = path.join(repositoryRoot, 'public', 'uploads')
-const reportPath = path.join(scriptDirectory, '.image-report-before.txt')
+const beforeReportPath = path.join(scriptDirectory, '.image-report-before.txt')
+const afterReportPath = path.join(scriptDirectory, '.image-report-after.txt')
 const rasterExtensions = new Set(['.png', '.jpg', '.jpeg'])
 
 // Phase 1 uses measured, image-specific settings. Do not overwrite those outputs
@@ -91,7 +92,7 @@ function imagePolicy(relativePath, size) {
   return { maxWidth: size < 100_000 ? undefined : 1920, quality: 80 }
 }
 
-async function createBeforeReport() {
+async function createImageReport(reportPath) {
   const files = (await Promise.all(assetRoots.map(walk))).flat()
   const rows = await Promise.all(
     files.map(async (filePath) => ({
@@ -168,18 +169,26 @@ async function optimizeAll() {
   }
 
   const thumbnailPath = path.join(repositoryRoot, 'public', 'thumbnail.png')
-  await optimizeThumbnail(thumbnailPath)
+  try {
+    await access(thumbnailPath)
+    await optimizeThumbnail(thumbnailPath)
+    console.log('Optimized public/thumbnail.png as an SNS-compatible JPEG exception.')
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error
+    console.log('Skipped public/thumbnail.png because the Phase 5 cleanup already removed it.')
+  }
 
   console.log(`Converted ${converted} raster images; skipped ${skipped} protected or Phase 1 images.`)
-  console.log('Optimized public/thumbnail.png as an SNS-compatible JPEG exception.')
 }
 
 const command = process.argv[2]
 
 if (command === '--report-before') {
-  await createBeforeReport()
+  await createImageReport(beforeReportPath)
+} else if (command === '--report-after') {
+  await createImageReport(afterReportPath)
 } else if (command === '--convert') {
   await optimizeAll()
 } else {
-  console.log('Usage: npm run optimize:images -- --report-before | --convert')
+  console.log('Usage: npm run optimize:images -- --report-before | --report-after | --convert')
 }
