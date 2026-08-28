@@ -91,7 +91,12 @@ function ItemCard({ item, row, rowIndex, rowCount, uploadingId, actions }) {
           {uploadingId === item.id && <p className='text-sm text-orange-200'>이미지를 업로드하고 있습니다…</p>}
           {item.uploadError && <p role='alert' className='text-sm text-red-300'>{item.uploadError}</p>}
           {!item.url && item.file && uploadingId !== item.id && !item.uploadError && <p className='text-sm text-white/60'>저장할 때 함께 업로드됩니다.</p>}
-          {(item.url || item.previewUrl) && <img src={item.url || item.previewUrl} alt='업로드 미리보기' loading='lazy' decoding='async' className='max-h-56 rounded-lg object-contain' />}
+          {/*
+            방금 올린 이미지는 커밋만 됐을 뿐 아직 배포 전이라 원격 URL이 404다.
+            그 URL을 미리보기로 요청하면 브라우저가 SPA 폴백 HTML을 이미지 자리에
+            캐시해 버리므로, 로컬 objectURL이 있으면 그쪽을 먼저 쓴다.
+          */}
+          {(item.previewUrl || item.url) && <img src={item.previewUrl || item.url} alt='업로드 미리보기' loading='lazy' decoding='async' className='max-h-56 rounded-lg object-contain' />}
           <input value={item.caption} onChange={(event) => actions.update(item.id, { caption: event.target.value })} placeholder='이미지 설명 (선택)' className='w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-white placeholder:text-white/40' />
           {row.items.length === 1 && <select value={item.width} onChange={(event) => actions.update(item.id, { width: event.target.value })} className='rounded border border-white/25 bg-[#191c20] px-2 py-1 text-sm'>
             <option value='full'>전체 너비</option><option value='half'>반 너비</option>

@@ -1,5 +1,5 @@
 {
-  "rewrites": [{ "source": "/((?!api/).*)", "destination": "/" }],
+  "rewrites": [{ "source": "/((?!api/|assets/|uploads/).*)", "destination": "/" }],
   "headers": [
     {
       "source": "/assets/(.*)",
@@ -7,7 +7,7 @@
     },
     {
       "source": "/uploads/(.*)",
-      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }]
     }
   ]
 }
