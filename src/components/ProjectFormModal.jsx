@@ -367,6 +367,8 @@ export default function ProjectFormModal({ isOpen, onClose, onCreated }) {
                     <img
                       src={img.previewUrl}
                       alt={`업로드 이미지 ${index + 1}`}
+                      loading='lazy'
+                      decoding='async'
                       className='h-full w-full object-cover'
                     />
                     {img.uploading && (

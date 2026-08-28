@@ -481,6 +481,8 @@ export default function ProjectsHome() {
                             <img
                               src={project.image}
                               alt={project.title}
+                              loading='lazy'
+                              decoding='async'
                               className='object-cover w-full h-full'
                             />
                           ) : (

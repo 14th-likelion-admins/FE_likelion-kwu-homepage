@@ -121,7 +121,16 @@ export default function Curriculum() {
           <h2 className='text-1xl font-semibold md:text-3xl'>{current.heading}</h2>
 
           <div className='absolute right-0 top-[34%] w-[16%] opacity-80 md:right-[-12%] md:top-[22%] md:w-[52%] md:translate-x-[60px]'>
-            <img src={current.logo} alt='' className='w-full object-contain' />
+            <img
+              src={current.logo}
+              alt=''
+              width={current.logoWidth}
+              height={current.logoHeight}
+              loading='eager'
+              fetchPriority='high'
+              decoding='async'
+              className='w-full object-contain'
+            />
           </div>
 
           <div className='mt-10 space-y-12 md:mt-14 md:space-y-16'>

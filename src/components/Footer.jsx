@@ -17,7 +17,7 @@ export default function Footer() {
             Contact us!
           </a>
           <a href={`mailto:${LINKS.EMAIL}`} aria-label={`Send email to ${LINKS.EMAIL}`}>
-            <img src={email} alt='email' className='w-8 md:w-8' />
+            <img src={email} alt='email' width='39' height='38' loading='lazy' decoding='async' className='w-8 md:w-8' />
           </a>
           <a
             href={LINKS.INSTAGRAM}
@@ -25,7 +25,7 @@ export default function Footer() {
             rel='noopener noreferrer'
             aria-label='Visit likelion_kwangwoon Instagram'
           >
-            <img src={insta} alt='instagram' className='w-6 h-6 md:w-6 md:h-6' />
+            <img src={insta} alt='instagram' width='26' height='26' loading='lazy' decoding='async' className='w-6 h-6 md:w-6 md:h-6' />
           </a>
         </div>
       </div>

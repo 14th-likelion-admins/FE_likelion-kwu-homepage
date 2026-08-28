@@ -60,7 +60,7 @@ export default function ImageCarousel({ images, alt }) {
     <div
       ref={containerRef}
       className='relative w-full select-none'
-      style={{ lineHeight: 0 }}
+      style={{ lineHeight: 0, aspectRatio: '16 / 9', overflow: 'hidden', backgroundColor: '#111315' }}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setHoverSide(null)}
       onTouchStart={handleTouchStart}
@@ -70,11 +70,13 @@ export default function ImageCarousel({ images, alt }) {
       <img
         src={list[safeIndex]}
         alt={alt}
-        className='w-full'
+        loading='lazy'
+        decoding='async'
+        className='h-full w-full'
         style={{
           display: 'block',
           width: '100%',
-          height: 'auto',
+          height: '100%',
           objectFit: 'contain',
           objectPosition: 'top',
         }}
