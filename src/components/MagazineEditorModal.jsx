@@ -8,11 +8,9 @@ import {
   createRow,
   createTextItem,
   insertRowAfter,
-  mergeItemIntoNeighborRow,
   moveItemToNewRow,
   moveItemToRow,
   removeItem,
-  shiftItemWithinRow,
   toRows,
   updateItem,
 } from '../utils/magazineBlocks'
@@ -43,9 +41,31 @@ function ColumnEdge({ rowId, index, dragging, disabled }) {
   />
 }
 
-function ItemCard({ item, row, rowIndex, rowCount, uploadingId, actions }) {
+/**
+ * 마우스가 블록 가장자리에 올라왔을 때만 나타나는 + 버튼. 클릭하면 이미지/텍스트 중 고를 수 있다.
+ * 호버로만 동작해서 데스크탑 전용이며, 모바일에서는 부모 쪽에서 아예 숨긴다.
+ */
+function AddBlockButton({ onAdd }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className='relative' onMouseLeave={() => setOpen(false)}>
+      <button
+        type='button'
+        onClick={() => setOpen((current) => !current)}
+        className={`flex h-6 w-6 items-center justify-center rounded-full border border-white/30 bg-[#191c20] text-sm leading-none text-white/70 transition hover:border-orange-300 hover:text-orange-200 ${open ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+        aria-label='블록 추가'
+        title='블록 추가'
+      >+</button>
+      {open && <div className='absolute left-1/2 top-full z-20 mt-1 flex -translate-x-1/2 gap-1 whitespace-nowrap rounded-lg border border-white/20 bg-[#191c20] p-1 shadow-xl'>
+        <button type='button' onClick={() => { onAdd('image'); setOpen(false) }} className='rounded px-2 py-1 text-xs hover:bg-white/10'>이미지</button>
+        <button type='button' onClick={() => { onAdd('text'); setOpen(false) }} className='rounded px-2 py-1 text-xs hover:bg-white/10'>텍스트</button>
+      </div>}
+    </div>
+  )
+}
+
+function ItemCard({ item, row, rowIndex, uploadingId, actions }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id: item.id })
-  const itemIndex = row.items.findIndex((entry) => entry.id === item.id)
   const style = transform
     ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`, zIndex: 40 }
     : undefined
@@ -54,7 +74,7 @@ function ItemCard({ item, row, rowIndex, rowCount, uploadingId, actions }) {
     <div
       ref={setNodeRef}
       style={style}
-      className={`relative min-w-0 flex-1 rounded-xl border border-white/20 bg-black/15 p-4 ${isDragging ? 'opacity-60 shadow-2xl' : ''}`}
+      className={`group relative min-w-0 flex-1 rounded-xl border border-white/20 bg-black/15 p-4 ${isDragging ? 'opacity-60 shadow-2xl' : ''}`}
     >
       <div className='mb-3 flex flex-wrap items-center justify-between gap-2 text-sm'>
         <div className='flex items-center gap-2'>
@@ -68,14 +88,7 @@ function ItemCard({ item, row, rowIndex, rowCount, uploadingId, actions }) {
           >⠿</button>
           <span className='text-white/65'>{item.type === 'text' ? '텍스트' : '이미지'}</span>
         </div>
-        <div className='flex gap-1'>
-          <button type='button' onClick={() => actions.shift(item.id, -1)} disabled={itemIndex === 0} className='rounded px-2 py-1 hover:bg-white/10 disabled:opacity-30' aria-label='같은 줄에서 왼쪽으로' title='같은 줄에서 왼쪽으로'>←</button>
-          <button type='button' onClick={() => actions.shift(item.id, 1)} disabled={itemIndex === row.items.length - 1} className='rounded px-2 py-1 hover:bg-white/10 disabled:opacity-30' aria-label='같은 줄에서 오른쪽으로' title='같은 줄에서 오른쪽으로'>→</button>
-          <button type='button' onClick={() => actions.toRow(item.id, rowIndex)} disabled={rowIndex === 0 && row.items.length === 1} className='rounded px-2 py-1 hover:bg-white/10 disabled:opacity-30' aria-label='윗줄로 빼내기' title='윗줄로 빼내기'>↑</button>
-          <button type='button' onClick={() => actions.toRow(item.id, rowIndex + 2)} disabled={rowIndex === rowCount - 1 && row.items.length === 1} className='rounded px-2 py-1 hover:bg-white/10 disabled:opacity-30' aria-label='아랫줄로 빼내기' title='아랫줄로 빼내기'>↓</button>
-          <button type='button' onClick={() => actions.merge(item.id, -1)} disabled={rowIndex === 0} className='rounded px-2 py-1 hover:bg-white/10 disabled:opacity-30' aria-label='윗줄 옆칸으로 붙이기' title='윗줄 옆칸으로 붙이기'>⇱</button>
-          <button type='button' onClick={() => actions.remove(item.id)} className='rounded px-2 py-1 text-red-300 hover:bg-white/10' aria-label='블록 삭제'>삭제</button>
-        </div>
+        <button type='button' onClick={() => actions.remove(item.id)} className='rounded px-2 py-1 text-sm text-red-300 hover:bg-white/10' aria-label='블록 삭제'>삭제</button>
       </div>
 
       {item.type === 'text' ? (
@@ -104,9 +117,8 @@ function ItemCard({ item, row, rowIndex, rowCount, uploadingId, actions }) {
         </div>
       )}
 
-      <div className='mt-4 flex gap-2 border-t border-white/10 pt-3'>
-        <button type='button' onClick={() => actions.addRowAfter(rowIndex, createTextItem())} className='rounded-md border border-white/25 px-3 py-1.5 text-sm hover:bg-white/10'>+ 텍스트</button>
-        <button type='button' onClick={() => actions.addRowAfter(rowIndex, createImageItem())} className='rounded-md border border-white/25 px-3 py-1.5 text-sm hover:bg-white/10'>+ 이미지</button>
+      <div className='absolute inset-x-0 -bottom-3 z-10 hidden justify-center md:flex'>
+        <AddBlockButton onAdd={(type) => actions.addRowAfter(rowIndex, type === 'image' ? createImageItem() : createTextItem())} />
       </div>
     </div>
   )
@@ -192,9 +204,6 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
   const actions = {
     update: (itemId, updates) => setRows((current) => updateItem(current, itemId, updates)),
     remove: (itemId) => setRows((current) => removeItem(current, itemId)),
-    shift: (itemId, direction) => setRows((current) => shiftItemWithinRow(current, itemId, direction)),
-    toRow: (itemId, gapIndex) => setRows((current) => moveItemToNewRow(current, itemId, gapIndex)),
-    merge: (itemId, direction) => setRows((current) => mergeItemIntoNeighborRow(current, itemId, direction)),
     addRowAfter: (rowIndex, item) => setRows((current) => insertRowAfter(current, rowIndex, item)),
     selectImage,
   }
@@ -350,7 +359,7 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
 
         <p className='mt-6 text-sm text-white/55'>
           ⠿ 손잡이를 끌어 옮깁니다. 블록 <span className='text-white/80'>옆</span>에 놓으면 같은 줄에 나란히, 줄 <span className='text-white/80'>사이</span>에 놓으면 새 줄이 됩니다.
-          한 줄에 최대 {MAX_COLUMNS}칸이며, 좁은 화면에서는 자동으로 세로로 쌓입니다.
+          한 줄에 최대 {MAX_COLUMNS}칸이며, 좁은 화면에서는 자동으로 세로로 쌓입니다. 블록 가장자리에 마우스를 올리면 나타나는 <span className='text-white/80'>+</span> 버튼으로 새 블록을 추가할 수 있어요. (데스크탑 전용)
         </p>
 
         <DndContext
@@ -370,10 +379,12 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
                 <div className='flex items-stretch'>
                   <ColumnEdge rowId={row.id} index={0} dragging={dragging} disabled={full} />
                   {row.items.map((item, itemIndex) => <Fragment key={item.id}>
-                    <ItemCard item={item} row={row} rowIndex={rowIndex} rowCount={rows.length} uploadingId={uploadingId} actions={actions} />
+                    <ItemCard item={item} row={row} rowIndex={rowIndex} uploadingId={uploadingId} actions={actions} />
                     <ColumnEdge rowId={row.id} index={itemIndex + 1} dragging={dragging} disabled={full} />
                   </Fragment>)}
-                  {row.items.length < MAX_COLUMNS && !dragging && <button type='button' onClick={() => setRows((current) => appendItemToRow(current, row.id, createTextItem()))} className='ml-1 shrink-0 rounded-xl border border-dashed border-white/25 px-3 text-sm text-white/45 transition hover:border-white/50 hover:text-white' title='이 줄에 칸 추가'>+ 칸</button>}
+                  {row.items.length < MAX_COLUMNS && !dragging && <div className='group ml-1 hidden w-8 shrink-0 items-center justify-center md:flex'>
+                    <AddBlockButton onAdd={(type) => setRows((current) => appendItemToRow(current, row.id, type === 'image' ? createImageItem() : createTextItem()))} />
+                  </div>}
                 </div>
                 <RowGap index={rowIndex + 1} dragging={dragging} />
               </Fragment>
