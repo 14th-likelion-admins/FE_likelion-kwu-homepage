@@ -1,11 +1,13 @@
-import feLogo from '../assets/curriculum/fe_logo.png'
-import beLogo from '../assets/curriculum/be_logo.png'
-import deLogo from '../assets/curriculum/de_logo.png'
+import feLogo from '../assets/curriculum/fe_logo.webp'
+import beLogo from '../assets/curriculum/be_logo.webp'
+import deLogo from '../assets/curriculum/de_logo.webp'
 
 export const curriculumData = {
   backend: {
     heading: '백엔드 커리큘럼 상세보기',
     logo: beLogo,
+    logoWidth: 800,
+    logoHeight: 948,
     items: [
       {
         title: '클라이언트–서버 구조와 HTTP, REST API의 기본 개념을 이해합니다',
@@ -47,6 +49,8 @@ export const curriculumData = {
   frontend: {
     heading: '프론트엔드 커리큘럼 상세보기',
     logo: feLogo,
+    logoWidth: 800,
+    logoHeight: 1018,
     items: [
       {
         title: 'Git과 GitHub 기본 사용법',
@@ -88,6 +92,8 @@ export const curriculumData = {
   design: {
     heading: '기획/디자인 커리큘럼 상세보기',
     logo: deLogo,
+    logoWidth: 800,
+    logoHeight: 800,
     items: [
       {
         title: '문제 정의 및 사용자 시나리오 보드 제작',

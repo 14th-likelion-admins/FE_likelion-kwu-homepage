@@ -1,7 +1,7 @@
 // src/components/Header.jsx
 import { Link, useNavigate } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
-import logo from '../assets/kw-logo.png'
+import logo from '../assets/kw-logo.webp'
 
 export default function Header() {
   const [aboutOpen, setAboutOpen] = useState(false)
@@ -41,7 +41,16 @@ export default function Header() {
       >
         <div className='mx-auto flex max-w-7xl items-center justify-between px-4 py-1.5 md:py-2.5'>
           <Link to='/' className='flex items-center gap-2'>
-            <img src={logo} alt='LIKELION Logo' className='h-6 w-6 md:h-8 md:w-8' />
+            <img
+              src={logo}
+              alt='LIKELION Logo'
+              width='48'
+              height='48'
+              loading='eager'
+              fetchPriority='high'
+              decoding='async'
+              className='h-6 w-6 md:h-8 md:w-8'
+            />
             <span className='hidden text-lg font-bold md:inline-block md:text-xl'>광운대 멋쟁이사자처럼</span>
           </Link>
 

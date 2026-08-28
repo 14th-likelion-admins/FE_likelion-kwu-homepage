@@ -3,14 +3,14 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import Core1 from '../assets/corevalue1.png'
-import Core2 from '../assets/corevalue2.png'
-import Core3 from '../assets/corevalue3.png'
-import mainsun from '../assets/mainsun.png'
-import noiseBg from '../assets/noise-bg.png'
-import noiseStar from '../assets/noise-star.png'
-import gradiantBg from '../assets/gradiant-bg.png'
-import supportButton from '../assets/support-button.png'
+import Core1 from '../assets/corevalue1.webp'
+import Core2 from '../assets/corevalue2.webp'
+import Core3 from '../assets/corevalue3.webp'
+import mainsun from '../assets/mainsun.webp'
+import noiseBg from '../assets/noise-bg-tile.webp'
+import noiseStar from '../assets/noise-star.webp'
+import gradiantBg from '../assets/gradiant-bg.webp'
+import supportButton from '../assets/support-button.webp'
 
 import { LINKS } from '../utils/links'
 import { loadFonts } from '../utils/fonts'
@@ -123,6 +123,7 @@ export default function Home() {
           style={{
             backgroundImage: `url(${noiseBg})`,
             backgroundRepeat: 'repeat',
+            backgroundSize: '512px 512px',
             opacity: 0.5,
           }}
         ></div>
@@ -160,7 +161,16 @@ export default function Home() {
                   transform: 'translate(-50%, -50%)',
                 }}
               >
-                <img src={mainsun} alt='Main Sun' className='object-cover w-full h-full' />
+                <img
+                  src={mainsun}
+                  alt='Main Sun'
+                  width='913'
+                  height='913'
+                  loading='eager'
+                  fetchPriority='high'
+                  decoding='async'
+                  className='object-cover w-full h-full'
+                />
               </div>
 
               {/* FRONTEND - 버튼 */}
@@ -318,7 +328,7 @@ export default function Home() {
               className='z-30 transition-opacity hover:opacity-80'
               type='button'
             >
-              <img src={supportButton} alt='지원 하기' className='w-auto h-12' />
+              <img src={supportButton} alt='지원 하기' width='283' height='71' loading='lazy' decoding='async' className='w-auto h-12' />
             </button>
           </div>
         </section>
@@ -426,7 +436,7 @@ export default function Home() {
                 }`}
                 style={{ transitionDelay: '0ms' }}
               >
-                <img src={Core1} alt='Responsibility' className='w-48 h-auto mb-6 md:w-56' />
+                <img src={Core1} alt='Responsibility' width='320' height='509' loading='lazy' decoding='async' className='w-48 h-auto mb-6 md:w-56' />
               </div>
 
               {/* Curiosity 이미지 */}
@@ -436,7 +446,7 @@ export default function Home() {
                 }`}
                 style={{ transitionDelay: '200ms' }}
               >
-                <img src={Core2} alt='Curiosity' className='w-48 h-auto mb-6 md:w-56' />
+                <img src={Core2} alt='Curiosity' width='320' height='513' loading='lazy' decoding='async' className='w-48 h-auto mb-6 md:w-56' />
               </div>
 
               {/* Cooperation 이미지 */}
@@ -446,7 +456,7 @@ export default function Home() {
                 }`}
                 style={{ transitionDelay: '400ms' }}
               >
-                <img src={Core3} alt='Cooperation' className='w-48 h-auto mb-6 md:w-56' />
+                <img src={Core3} alt='Cooperation' width='320' height='509' loading='lazy' decoding='async' className='w-48 h-auto mb-6 md:w-56' />
               </div>
             </div>
           </div>
@@ -494,7 +504,7 @@ export default function Home() {
                 onClick={handleApplyClick}
                 className='transition-opacity hover:opacity-80'
               >
-                <img src={supportButton} alt='지원 하기' className='w-auto h-12 mx-auto' />
+                <img src={supportButton} alt='지원 하기' width='283' height='71' loading='lazy' decoding='async' className='w-auto h-12 mx-auto' />
               </button>
             </div>
           </div>

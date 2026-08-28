@@ -138,7 +138,7 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
                 <div className='space-y-3'>
                   <input type='file' accept='image/*' onChange={(event) => handleImageUpload(block.id, event.target.files?.[0])} disabled={uploadingId === block.id} className='block w-full text-sm text-white/75 file:mr-3 file:rounded file:border-0 file:bg-orange-300 file:px-3 file:py-1 file:text-[#111315]' />
                   {uploadingId === block.id && <p className='text-sm text-orange-200'>이미지를 업로드하고 있습니다…</p>}
-                  {block.url && <img src={block.url} alt='업로드 미리보기' className='max-h-56 rounded-lg object-contain' />}
+                  {block.url && <img src={block.url} alt='업로드 미리보기' loading='lazy' decoding='async' className='max-h-56 rounded-lg object-contain' />}
                   <input value={block.caption} onChange={(event) => updateBlock(block.id, { caption: event.target.value })} placeholder='이미지 설명 (선택)' className='w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-white placeholder:text-white/40' />
                   <select value={block.width} onChange={(event) => updateBlock(block.id, { width: event.target.value })} className='rounded border border-white/25 bg-[#191c20] px-2 py-1 text-sm'><option value='full'>전체 너비</option><option value='half'>반 너비</option></select>
                 </div>

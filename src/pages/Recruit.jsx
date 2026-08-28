@@ -1,34 +1,34 @@
 ﻿import { useEffect, useState } from 'react'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import recruitNoise from '../assets/recruit/Noise & Texture.png'
-import leftHalf from '../assets/recruit/left_half.png'
-import fullCircle from '../assets/recruit/full_circle.png'
-import halfCircleLine from '../assets/recruit/half_circle_line.png'
-import supportButton from '../assets/recruit/support-button.png'
-import recruitMainText from '../assets/recruit/recruit_main_txt.png'
-import designBox from '../assets/recruit/design.png'
-import frontendBox from '../assets/recruit/frontend.png'
-import backendBox from '../assets/recruit/backend.png'
-import passionCard from '../assets/recruit/열정.png'
-import coworkCard from '../assets/recruit/협업.png'
-import responseCard from '../assets/recruit/책임.png'
-import scheduleImage from '../assets/recruit/schedule.png'
+import recruitNoise from '../assets/recruit/noise-texture-recruit-tile.webp'
+import leftHalf from '../assets/recruit/left_half.webp'
+import fullCircle from '../assets/recruit/full_circle.webp'
+import halfCircleLine from '../assets/recruit/half_circle_line.webp'
+import supportButton from '../assets/recruit/support-button.webp'
+import recruitMainText from '../assets/recruit/recruit_main_txt.webp'
+import designBox from '../assets/recruit/design.webp'
+import frontendBox from '../assets/recruit/frontend.webp'
+import backendBox from '../assets/recruit/backend.webp'
+import passionCard from '../assets/recruit/열정.webp'
+import coworkCard from '../assets/recruit/협업.webp'
+import responseCard from '../assets/recruit/책임.webp'
+import scheduleImage from '../assets/recruit/schedule.webp'
 import { loadFonts } from '../utils/fonts'
 
 const DESIGN_WIDTH = 1728
 const DESIGN_HEIGHT = 3200
 
 const partCards = [
-  { id: 'design', image: designBox, href: '/curriculum/design' },
-  { id: 'frontend', image: frontendBox, href: '/curriculum/frontend' },
-  { id: 'backend', image: backendBox, href: '/curriculum/backend' },
+  { id: 'design', image: designBox, width: 410, height: 199, href: '/curriculum/design' },
+  { id: 'frontend', image: frontendBox, width: 410, height: 199, href: '/curriculum/frontend' },
+  { id: 'backend', image: backendBox, width: 410, height: 199, href: '/curriculum/backend' },
 ]
 
 const targetCards = [
-  { id: 'passion', image: passionCard },
-  { id: 'cowork', image: coworkCard },
-  { id: 'response', image: responseCard },
+  { id: 'passion', image: passionCard, width: 410, height: 380 },
+  { id: 'cowork', image: coworkCard, width: 410, height: 380 },
+  { id: 'response', image: responseCard, width: 410, height: 380 },
 ]
 
 const scheduleItems = [
@@ -72,8 +72,8 @@ export default function Recruit() {
         className='pointer-events-none absolute inset-0 z-[1] opacity-[0.82]'
         style={{
           backgroundImage: `url(${recruitNoise})`,
-          backgroundRepeat: 'repeat-y',
-          backgroundSize: '1940px auto',
+          backgroundRepeat: 'repeat',
+          backgroundSize: '512px 512px',
           backgroundPosition: 'top center',
         }}
       />
@@ -86,7 +86,7 @@ export default function Recruit() {
         rel='noreferrer noopener'
         className='fixed bottom-8 right-6 z-50 hidden transition-opacity hover:opacity-85 md:bottom-12 md:right-10 md:block'
       >
-        <img src={supportButton} alt='지원 하기' className='h-11 w-auto md:h-14' />
+        <img src={supportButton} alt='지원 하기' width='283' height='71' loading='eager' decoding='async' className='h-11 w-auto md:h-14' />
       </a>
 
       <div className='relative z-10 w-full pt-[121px]' style={{ height: `${sceneHeight}px` }}>
@@ -102,17 +102,29 @@ export default function Recruit() {
           <img
             src={fullCircle}
             alt=''
+            width='716'
+            height='716'
+            loading='eager'
+            decoding='async'
             className='pointer-events-none absolute -right-[285px] top-[171px] z-[1] w-[564px] max-w-none opacity-95'
           />
 
           <img
             src={halfCircleLine}
             alt=''
+            width='1200'
+            height='973'
+            loading='eager'
+            decoding='async'
             className='pointer-events-none absolute left-1/2 top-[595px] z-[1] w-[1940px] max-w-none -translate-x-1/2 opacity-[0.84]'
           />
           <img
             src={leftHalf}
             alt=''
+            width='853'
+            height='1705'
+            loading='lazy'
+            decoding='async'
             className='pointer-events-none absolute -left-[200px] top-[1775px] z-[1] w-[716px] max-w-none opacity-[0.9]'
           />
 
@@ -120,6 +132,11 @@ export default function Recruit() {
           <img
             src={recruitMainText}
             alt='BE THE LION, CODE YOUR FUTURE AND RULE YOUR WORLD'
+            width='1225'
+            height='169'
+            loading='eager'
+            fetchPriority='high'
+            decoding='async'
             className='mx-auto w-full max-w-[760px] object-contain md:max-w-[1062px]'
           />
             <div className='mt-[60px] flex flex-wrap justify-center gap-3'>
@@ -143,7 +160,7 @@ export default function Recruit() {
                   href={part.href}
                   className='group relative mx-auto block w-full max-w-[660px] overflow-hidden rounded-2xl transition-transform hover:-translate-y-0.5'
                 >
-                  <img src={part.image} alt='' className='block h-auto w-full object-contain' />
+                  <img src={part.image} alt='' width={part.width} height={part.height} loading='lazy' decoding='async' className='block h-auto w-full object-contain' />
                 </a>
               ))}
             </div>
@@ -153,7 +170,7 @@ export default function Recruit() {
             <h2 className='text-center text-[38px] font-medium'>모집 대상</h2>
             <div className='mx-auto mt-12 grid max-w-[1280px] grid-cols-1 gap-5 md:grid-cols-3'>
               {targetCards.map((item) => (
-                <img key={item.id} src={item.image} alt='' className='mx-auto h-auto w-full max-w-[660px] object-contain' />
+                <img key={item.id} src={item.image} alt='' width={item.width} height={item.height} loading='lazy' decoding='async' className='mx-auto h-auto w-full max-w-[660px] object-contain' />
               ))}
             </div>
           </section>
@@ -161,7 +178,7 @@ export default function Recruit() {
           <section id='schedule' className='relative z-10 px-6 pb-40 pt-[150px] md:pt-[545px]'>
             <h2 className='text-center text-[38px] font-medium'>모집 일정</h2>
             <div className='mx-auto mt-10 max-w-[1320px]'>
-              <img src={scheduleImage} alt='모집 일정 라인' className='translate-x-[10px] w-full object-contain' />
+              <img src={scheduleImage} alt='모집 일정 라인' width='1626' height='30' loading='lazy' decoding='async' className='translate-x-[10px] w-full object-contain' />
               <div className='mx-auto mt-7 grid max-w-[1080px] grid-cols-5 gap-x-3 gap-y-10 text-center md:max-w-[1120px] md:gap-x-4'>
                 {scheduleItems.map((item) => (
                   <div key={item.date} className='space-y-1'>
