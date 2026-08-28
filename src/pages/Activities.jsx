@@ -11,6 +11,7 @@ import cardHackathon from '../assets/activities/활통소개아이콘3.webp'
 import cardIdeathon from '../assets/activities/활동소개아이콘4.webp'
 import { loadFonts } from '../utils/fonts'
 import { toRows } from '../utils/magazineBlocks'
+import { renderInline, renderMarkdown } from '../utils/markdown'
 
 // 에디터는 운영진만 열고 드래그 라이브러리까지 딸려 오므로, 방문자 번들에서 떼어낸다.
 const MagazineEditorModal = lazy(() => import('../components/MagazineEditorModal'))
@@ -27,6 +28,8 @@ const activityCards = [
 function MagazineItem({ item }) {
   // 업로드할 때 저장해 둔 픽셀 크기가 있으면 넘겨 고유 비율을 미리 잡아준다.
   // 크기를 모르면 로드 전 높이가 0이라 행이 접히고, 지연 로딩 대상으로도 안 잡힌다.
+  // 가로는 제한하지 않고 세로만 제한한다: max-height와 max-width(100%)를 함께 두면
+  // 브라우저가 원본 비율을 유지한 채 둘 중 더 좁게 만드는 쪽으로 자동 축소해 준다.
   if (item.type === 'image') return <figure>
     <img
       src={item.url}
@@ -35,13 +38,13 @@ function MagazineItem({ item }) {
       height={item.pixelHeight || undefined}
       loading='lazy'
       decoding='async'
-      className='h-auto w-full rounded-xl'
+      className='mx-auto block h-auto max-h-[280px] w-auto max-w-full rounded-xl md:max-h-[460px]'
     />
-    {item.caption && <figcaption className='mt-2 text-sm text-white/65'>{item.caption}</figcaption>}
+    {item.caption && <figcaption className='mt-2 text-center text-sm text-white/65'>{item.caption}</figcaption>}
   </figure>
   return item.style === 'heading'
-    ? <h3 className='text-xl font-semibold leading-relaxed md:text-3xl'>{item.text}</h3>
-    : <p className='whitespace-pre-wrap text-base leading-relaxed text-white/90 md:text-lg'>{item.text}</p>
+    ? <h3 className='text-xl font-semibold leading-relaxed md:text-3xl'>{renderInline(item.text, 'heading')}</h3>
+    : <div className='space-y-3 text-base leading-relaxed text-white/90 md:text-lg'>{renderMarkdown(item.text)}</div>
 }
 
 function MagazineContent({ magazine }) {
@@ -52,9 +55,17 @@ function MagazineContent({ magazine }) {
     {rows.length === 0 ? <p className='mt-6 text-white/70'>등록된 본문이 없습니다.</p> : <div className='mt-7 space-y-6 md:mt-10 md:space-y-8'>
       {rows.map((row) => <div key={row.id} className='flex flex-col gap-5 md:flex-row md:items-start md:gap-6'>
         {/* flex-1은 md 이상에서만. 모바일은 flex-col이라 flex-basis:0이 높이에 걸려 행이 접힌다. */}
-        {row.items.map((item) => <div key={item.id} className={row.items.length === 1 && item.width === 'half' ? 'w-full md:w-1/2' : 'w-full min-w-0 md:flex-1'}>
-          <MagazineItem item={item} />
-        </div>)}
+        {/* 사진이 다른 항목과 나란히 놓이거나(좌/우 배치) 절반 너비로 지정되면, 페이지 전체 폭의 1/3로 좁힌다. */}
+        {row.items.map((item) => {
+          const sideBySide = row.items.length > 1
+          const narrowImage = item.type === 'image' && (sideBySide || item.width === 'half')
+          const widthClass = narrowImage
+            ? `w-full md:w-1/3 ${sideBySide ? 'md:flex-none' : ''}`
+            : 'w-full min-w-0 md:flex-1'
+          return <div key={item.id} className={widthClass}>
+            <MagazineItem item={item} />
+          </div>
+        })}
       </div>)}
     </div>}
   </article>
@@ -108,8 +119,7 @@ export default function Activities() {
         <h1 className='text-center text-[14px] font-semibold tracking-tight md:text-[20px]'>광운대 멋쟁이사자처럼의 활동을 소개합니다.</h1>
         <div className='mb-[30px] mt-10 grid grid-cols-1 gap-[30px] sm:grid-cols-2 sm:gap-5 lg:mt-8 lg:grid-cols-4 lg:gap-0.5'>
           {activityCards.map((card) => {
-            const selected = card.id === selectedActivity
-            return <article key={card.id} role='button' tabIndex={0} onClick={() => selectCard(card.id)} onKeyDown={(event) => handleCardKeyDown(event, card.id)} className={`group relative mx-auto flex h-[136px] w-full max-w-[268px] cursor-pointer flex-row items-center gap-4 overflow-hidden rounded-[16px] border bg-white/[0.22] px-5 py-4 transition sm:h-[500px] sm:flex-col sm:items-center sm:rounded-[30px] sm:px-6 sm:pb-8 sm:pt-10 lg:h-[420px] lg:max-w-[276px] ${selected ? 'border-orange-300 shadow-[0_0_20px_rgba(255,153,102,0.3)]' : 'border-white/85'} focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-orange-300`} aria-label={card.id === 'project' ? '프로젝트 페이지로 이동' : `${card.title} 매거진 보기`}>
+            return <article key={card.id} role='button' tabIndex={0} onClick={() => selectCard(card.id)} onKeyDown={(event) => handleCardKeyDown(event, card.id)} className='group relative mx-auto flex h-[136px] w-full max-w-[268px] cursor-pointer flex-row items-center gap-4 overflow-hidden rounded-[16px] border border-white/85 bg-white/[0.22] px-5 py-4 transition hover:border-orange-300 hover:shadow-[0_0_20px_rgba(255,153,102,0.3)] sm:h-[500px] sm:flex-col sm:items-center sm:rounded-[30px] sm:px-6 sm:pb-8 sm:pt-10 lg:h-[420px] lg:max-w-[276px] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-orange-300' aria-label={card.id === 'project' ? '프로젝트 페이지로 이동' : `${card.title} 매거진 보기`}>
               <span aria-hidden='true' className='activity-card-shine pointer-events-none absolute inset-y-[-20%] left-0 z-10 w-[35%] bg-gradient-to-r from-transparent via-white/45 to-transparent' />
               <div className='flex h-[82px] w-[82px] shrink-0 items-center justify-center sm:h-[220px] sm:w-full'><img src={card.image} alt='' width={card.width} height={card.height} loading='eager' decoding='async' className='w-full object-contain sm:w-[85%]' /></div>
               <div className='flex-1 sm:mt-auto sm:w-full sm:flex-none sm:-translate-y-[50px]'><h2 className='text-left text-[18px] font-normal leading-[1.1] sm:flex sm:h-[76px] sm:items-end sm:justify-center sm:text-center sm:text-[26px] sm:font-semibold lg:text-[24px]'>{card.title}</h2><p className='mt-2 whitespace-pre-line text-left text-[12px] font-normal leading-[1.28] text-white/95 sm:mt-4 sm:min-h-[116px] sm:text-center sm:text-[16px] sm:font-medium sm:leading-[1.28] lg:text-[14px]'>{card.description}</p></div>
