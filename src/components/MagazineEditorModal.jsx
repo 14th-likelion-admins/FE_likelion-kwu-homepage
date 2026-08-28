@@ -117,6 +117,7 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
     return normalized.length > 0 ? normalized : [createRow([createTextItem()])]
   })
   const [passphrase, setPassphrase] = useState('')
+  const [showPassphrase, setShowPassphrase] = useState(false)
   const [uploadingId, setUploadingId] = useState(null)
   const [draggingId, setDraggingId] = useState(null)
   const [saving, setSaving] = useState(false)
@@ -138,9 +139,11 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
   const uploadItemImage = async (itemId, file) => {
     setUploadingId(itemId)
     try {
-      const url = await uploadImage(file, 'magazines', passphrase)
-      setRows((current) => updateItem(current, itemId, { url, uploadError: '' }))
-      return url
+      // 픽셀 크기는 렌더러가 <img width height>로 쓴다. 레이아웃 폭인 width('full'|'half')와
+      // 헷갈리지 않도록 pixelWidth/pixelHeight로 따로 담는다.
+      const { url, width, height } = await uploadImage(file, 'magazines', passphrase)
+      setRows((current) => updateItem(current, itemId, { url, pixelWidth: width, pixelHeight: height, uploadError: '' }))
+      return { url, width, height }
     } catch (uploadError) {
       setRows((current) => updateItem(current, itemId, { uploadError: uploadMessage(uploadError) }))
       throw uploadError
@@ -237,9 +240,19 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
       const blocks = rows.map((row) => ({
         id: row.id,
         type: 'row',
-        items: row.items.map((item) => (item.type === 'image'
-          ? { id: item.id, type: 'image', url: uploaded.get(item.id) ?? item.url, caption: item.caption, width: item.width }
-          : { id: item.id, type: 'text', text: item.text, style: item.style })),
+        items: row.items.map((item) => {
+          if (item.type !== 'image') return { id: item.id, type: 'text', text: item.text, style: item.style }
+          const fresh = uploaded.get(item.id)
+          return {
+            id: item.id,
+            type: 'image',
+            url: fresh?.url ?? item.url,
+            caption: item.caption,
+            width: item.width,
+            pixelWidth: fresh?.width ?? item.pixelWidth ?? null,
+            pixelHeight: fresh?.height ?? item.pixelHeight ?? null,
+          }
+        }),
       }))
 
       await saveMagazine(activityType, Number(generation), { title: title.trim(), blocks }, passphrase)
@@ -300,8 +313,33 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
           <input value={title} onChange={(event) => setTitle(event.target.value)} placeholder='매거진 제목' className='mt-2 w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-white placeholder:text-white/40' />
         </label>
 
+        {/*
+          type='password'를 쓰면 로그인 폼이 아니어도 Chrome이 비밀번호 저장을 제안한다.
+          운영진끼리 공유하는 값이라 브라우저 자격증명으로 저장될 이유가 없어,
+          텍스트 입력에 -webkit-text-security로 가리고 보기 토글을 붙였다.
+          값이 있을 때만 가려서 placeholder는 그대로 읽히게 한다.
+        */}
         <label className='mt-4 block text-sm'>운영진 암호
-          <input type='password' value={passphrase} onChange={(event) => changePassphrase(event.target.value)} placeholder='운영진끼리 공유한 암호' className='mt-2 w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-white placeholder:text-white/40' />
+          <div className='relative mt-2'>
+            <input
+              type='text'
+              value={passphrase}
+              onChange={(event) => changePassphrase(event.target.value)}
+              placeholder='운영진끼리 공유한 암호'
+              name='content-write-key'
+              autoComplete='off'
+              autoCorrect='off'
+              autoCapitalize='off'
+              spellCheck='false'
+              data-lpignore='true'
+              data-1p-ignore=''
+              data-form-type='other'
+              className={`w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 pr-16 text-white placeholder:text-white/40 ${!showPassphrase && passphrase ? '[-webkit-text-security:disc]' : ''}`}
+            />
+            <button type='button' onClick={() => setShowPassphrase((current) => !current)} className='absolute inset-y-0 right-2 my-auto h-7 rounded px-2 text-xs text-white/60 transition hover:bg-white/10 hover:text-white'>
+              {showPassphrase ? '숨기기' : '보기'}
+            </button>
+          </div>
         </label>
         {hasHangul && <p className='mt-2 text-sm text-orange-200'>암호에 한글이 섞여 있습니다. 한/영 키를 확인해 주세요.</p>}
 

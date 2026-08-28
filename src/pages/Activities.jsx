@@ -25,8 +25,18 @@ const activityCards = [
 ]
 
 function MagazineItem({ item }) {
+  // 업로드할 때 저장해 둔 픽셀 크기가 있으면 넘겨 고유 비율을 미리 잡아준다.
+  // 크기를 모르면 로드 전 높이가 0이라 행이 접히고, 지연 로딩 대상으로도 안 잡힌다.
   if (item.type === 'image') return <figure>
-    <img src={item.url} alt={item.caption || ''} loading='lazy' decoding='async' className='w-full rounded-xl object-cover' />
+    <img
+      src={item.url}
+      alt={item.caption || ''}
+      width={item.pixelWidth || undefined}
+      height={item.pixelHeight || undefined}
+      loading='lazy'
+      decoding='async'
+      className='h-auto w-full rounded-xl'
+    />
     {item.caption && <figcaption className='mt-2 text-sm text-white/65'>{item.caption}</figcaption>}
   </figure>
   return item.style === 'heading'
@@ -41,7 +51,8 @@ function MagazineContent({ magazine }) {
     <h2 className='text-2xl font-semibold md:text-4xl'>{magazine.title}</h2>
     {rows.length === 0 ? <p className='mt-6 text-white/70'>등록된 본문이 없습니다.</p> : <div className='mt-7 space-y-6 md:mt-10 md:space-y-8'>
       {rows.map((row) => <div key={row.id} className='flex flex-col gap-5 md:flex-row md:items-start md:gap-6'>
-        {row.items.map((item) => <div key={item.id} className={row.items.length === 1 && item.width === 'half' ? 'w-full md:w-1/2' : 'min-w-0 flex-1'}>
+        {/* flex-1은 md 이상에서만. 모바일은 flex-col이라 flex-basis:0이 높이에 걸려 행이 접힌다. */}
+        {row.items.map((item) => <div key={item.id} className={row.items.length === 1 && item.width === 'half' ? 'w-full md:w-1/2' : 'w-full min-w-0 md:flex-1'}>
           <MagazineItem item={item} />
         </div>)}
       </div>)}
