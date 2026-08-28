@@ -6,23 +6,29 @@
 
 ## sharp를 저장소 의존성에 넣지 않는 이유
 
-이 스크립트들은 `sharp`를 쓰지만, `sharp`는 플랫폼별 네이티브 바이너리를
-받아오는 무거운 패키지입니다. `devDependencies`에 넣으면 Vercel 배포 빌드가
-매번 이걸 설치하려다 실패합니다. 실제로 그렇게 배포가 깨진 적이 있습니다.
+`sharp`는 플랫폼별 네이티브 바이너리를 내려받는 무거운 패키지인데, 여기서만
+쓰는 일회성 도구입니다. `devDependencies`에 넣으면 Vercel이 배포할 때마다
+설치하게 되므로, 빌드 시간만 쓰고 얻는 게 없습니다.
 
 그래서 필요할 때만 임시로 설치해서 씁니다.
+
+> 예전에 이 문서는 "sharp를 넣으면 Vercel 빌드가 실패한다"고 적혀 있었는데
+> 틀린 설명이었습니다. 실제 원인은 `package.json`만 고치고 `pnpm-lock.yaml`을
+> 갱신하지 않은 것이었습니다. 저장소 루트 README를 참고하세요.
 
 ## 사용법
 
 ```bash
-npm i --no-save sharp
-npm run optimize:images
+pnpm add -D sharp
+pnpm run optimize:images
 ```
 
-작업이 끝나면 되돌립니다.
+작업이 끝나면 **`package.json`과 `pnpm-lock.yaml`을 반드시 되돌립니다.**
+그대로 커밋하면 sharp가 배포 의존성으로 들어갑니다.
 
 ```bash
-npm ci
+git checkout -- package.json pnpm-lock.yaml
+pnpm install
 ```
 
 ## 스크립트
