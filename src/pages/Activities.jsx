@@ -83,6 +83,10 @@ export default function Activities() {
     setEditorMode(null)
     setSavedNotice('저장되었습니다. 배포가 반영되기까지 1분 정도 걸릴 수 있습니다.')
   }
+  const handleDeleted = () => {
+    setEditorMode(null)
+    setSavedNotice('삭제되었습니다. 배포가 반영되기까지 1분 정도 걸릴 수 있습니다.')
+  }
 
   return <div className='relative flex min-h-screen flex-col overflow-x-hidden text-white' style={{ backgroundColor: '#111315', fontFamily: 'Space Grotesk' }}>
     <div className='pointer-events-none absolute inset-0 z-[1] opacity-[0.82]' style={{ backgroundImage: `url(${noiseTexture})`, backgroundRepeat: 'repeat', backgroundSize: '512px 512px', backgroundPosition: 'top center' }} />
@@ -106,7 +110,7 @@ export default function Activities() {
             const active = generation === selectedGeneration
             return <button key={generation} type='button' onClick={() => selectGeneration(generation)} className={`inline-flex h-10 min-w-12 items-center justify-center rounded-full border px-4 text-sm font-semibold transition ${active ? 'border-orange-300 bg-white text-orange-500 shadow-[0_0_16px_rgba(255,153,102,0.35)]' : 'border-white/35 bg-transparent text-white hover:border-white/70'}`}>{generation}th</button>
           })}</div><div className='flex items-center gap-1'>
-            <button type='button' onClick={() => openEditor('create')} className='inline-flex h-8 items-center rounded-full px-2 text-sm font-medium text-white/40 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60' aria-label='매거진 등록'>+ 등록</button>
+            <button type='button' onClick={() => openEditor('create')} disabled={Boolean(magazine)} title={magazine ? '이 활동·기수에는 이미 매거진이 있습니다. 수정하거나 삭제해 주세요.' : '새 매거진 등록'} className='inline-flex h-8 items-center rounded-full px-2 text-sm font-medium text-white/40 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60 disabled:cursor-not-allowed disabled:text-white/15 disabled:hover:text-white/15' aria-label='매거진 등록'>+ 등록</button>
             {magazine && <button type='button' onClick={() => openEditor('edit')} className='inline-flex h-8 items-center rounded-full px-2 text-sm font-medium text-white/40 transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60' aria-label='현재 매거진 수정'>수정</button>}
           </div></div>
           <div className='mt-5 border-t border-white/25' />
@@ -118,7 +122,7 @@ export default function Activities() {
     </main>
     <div className='relative z-20 w-full px-4 pb-3'><Footer /></div>
     {editorMode && <Suspense fallback={<div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 text-sm text-white/70'>편집기를 불러오는 중…</div>}>
-      <MagazineEditorModal initialActivity={ACTIVITY_TYPES[selectedActivity]} initialGeneration={selectedGeneration} initialMagazine={editorMode === 'edit' ? magazine : null} onClose={() => setEditorMode(null)} onSaved={handleSaved} />
+      <MagazineEditorModal initialActivity={ACTIVITY_TYPES[selectedActivity]} initialGeneration={selectedGeneration} initialMagazine={editorMode === 'edit' ? magazine : null} onClose={() => setEditorMode(null)} onSaved={handleSaved} onDeleted={handleDeleted} />
     </Suspense>}
   </div>
 }

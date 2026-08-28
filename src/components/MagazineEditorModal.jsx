@@ -1,6 +1,6 @@
 import { Fragment, useState } from 'react'
 import { DndContext, PointerSensor, closestCenter, useDraggable, useDroppable, useSensor, useSensors } from '@dnd-kit/core'
-import { saveMagazine, uploadImage } from '../api/magazineApi'
+import { deleteMagazine, saveMagazine, uploadImage } from '../api/magazineApi'
 import {
   MAX_COLUMNS,
   appendItemToRow,
@@ -107,7 +107,7 @@ function ItemCard({ item, row, rowIndex, rowCount, uploadingId, actions }) {
   )
 }
 
-export default function MagazineEditorModal({ initialActivity, initialGeneration, initialMagazine, onClose, onSaved }) {
+export default function MagazineEditorModal({ initialActivity, initialGeneration, initialMagazine, onClose, onSaved, onDeleted }) {
   const isEditing = Boolean(initialMagazine)
   const [activityType, setActivityType] = useState(initialActivity)
   const [generation, setGeneration] = useState(initialGeneration)
@@ -120,6 +120,8 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
   const [uploadingId, setUploadingId] = useState(null)
   const [draggingId, setDraggingId] = useState(null)
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [error, setError] = useState('')
 
   // 카드 안에 입력 요소가 많아서, 살짝 끌어야 드래그로 인식하도록 문턱을 둔다.
@@ -249,6 +251,26 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
     }
   }
 
+  /** 폼에서 활동·기수를 바꿨더라도, 지우는 대상은 열 때의 그 매거진이다. */
+  const handleDelete = async () => {
+    if (!passphrase.trim()) {
+      setError('운영진 암호를 입력해 주세요.')
+      return
+    }
+    setDeleting(true)
+    setError('')
+    try {
+      await deleteMagazine(initialActivity, Number(initialGeneration), passphrase)
+      onDeleted({ activityType: initialActivity, generation: Number(initialGeneration) })
+    } catch (deleteError) {
+      setError(deleteError.status === 401 ? '운영진 암호가 올바르지 않습니다.' : deleteError.message || '매거진 삭제에 실패했습니다.')
+      setConfirmingDelete(false)
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  const busy = saving || deleting || uploadingId !== null
   const dragging = Boolean(draggingId)
   // 한/영 전환을 깜빡하고 친 경우를 바로 알아채도록 한다. 완성형·자모·호환자모 모두 잡는다.
   const hasHangul = /[ᄀ-ᇿ㄰-㆏가-힯]/.test(passphrase)
@@ -321,8 +343,18 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
         {error && <p role='alert' className='mt-4 text-sm text-red-300'>{error}</p>}
         <div className='mt-7 flex justify-end gap-3'>
           <button type='button' onClick={onClose} className='rounded-lg border border-white/30 px-4 py-2 text-sm hover:bg-white/10'>취소</button>
-          <button type='button' onClick={handleSave} disabled={saving || uploadingId !== null} className='rounded-lg bg-orange-300 px-4 py-2 text-sm font-semibold text-[#111315] hover:bg-orange-200 disabled:cursor-not-allowed disabled:opacity-60'>{saving ? '저장 중…' : '저장'}</button>
+          <button type='button' onClick={handleSave} disabled={busy} className='rounded-lg bg-orange-300 px-4 py-2 text-sm font-semibold text-[#111315] hover:bg-orange-200 disabled:cursor-not-allowed disabled:opacity-60'>{saving ? '저장 중…' : '저장'}</button>
         </div>
+
+        {isEditing && <div className='mt-8 border-t border-white/10 pt-5'>
+          {confirmingDelete ? <div className='flex flex-wrap items-center justify-between gap-3'>
+            <p className='text-sm text-red-200'>{initialActivity} {initialGeneration}기 매거진을 삭제합니다. 되돌릴 수 없습니다.</p>
+            <div className='flex gap-2'>
+              <button type='button' onClick={() => setConfirmingDelete(false)} disabled={deleting} className='rounded-lg border border-white/30 px-3 py-1.5 text-sm hover:bg-white/10 disabled:opacity-50'>취소</button>
+              <button type='button' onClick={handleDelete} disabled={busy} className='rounded-lg bg-red-500/80 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-60'>{deleting ? '삭제 중…' : '삭제 확인'}</button>
+            </div>
+          </div> : <button type='button' onClick={() => setConfirmingDelete(true)} className='text-sm text-red-300/80 transition hover:text-red-300'>이 매거진 삭제</button>}
+        </div>}
       </div>
     </div>
   )
