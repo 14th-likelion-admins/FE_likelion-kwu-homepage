@@ -3,7 +3,7 @@ import { Buffer } from 'node:buffer';
 import { putFile } from './_lib/github.js';
 import { readRequestBuffer, requireMethod, requirePassphrase, sendJson } from './_lib/request.js';
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024;
+const MAX_FILE_SIZE = 4 * 1024 * 1024;
 const ALLOWED_FOLDERS = new Set(['magazines', 'projects']);
 const MIME_EXTENSIONS = {
   'image/jpeg': 'jpg',
@@ -51,7 +51,7 @@ export default async function handler(request, response) {
       return sendJson(response, 400, { success: false, message: 'multipart/form-data 요청이 필요합니다.' });
     }
 
-    // Multipart overhead is small; the file itself is still checked against exactly 5 MB below.
+    // Multipart overhead is small; the file itself is still checked against exactly 4 MB below.
     const body = await readRequestBuffer(request, MAX_FILE_SIZE + 64 * 1024);
     const parts = multipartParts(body, contentType);
     const fields = Object.fromEntries(parts.filter((part) => !part.filename).map((part) => [part.name, part.value.toString('utf8')]));
@@ -65,7 +65,7 @@ export default async function handler(request, response) {
       return sendJson(response, 400, { success: false, message: '이미지 파일만 업로드할 수 있습니다.' });
     }
     if (file.value.length > MAX_FILE_SIZE) {
-      return sendJson(response, 400, { success: false, message: '이미지 파일은 5MB 이하여야 합니다.' });
+      return sendJson(response, 400, { success: false, message: '이미지 파일은 4MB 이하여야 합니다.' });
     }
 
     // 확장자는 클라이언트가 보낸 파일명이 아니라 이미 검증된 mimeType에서만 결정한다.
@@ -77,7 +77,7 @@ export default async function handler(request, response) {
     return sendJson(response, 200, { success: true, url: `/uploads/${fields.folder}/${filename}` });
   } catch (error) {
     if (error.code === 'REQUEST_TOO_LARGE') {
-      return sendJson(response, 400, { success: false, message: '이미지 파일은 5MB 이하여야 합니다.' });
+      return sendJson(response, 400, { success: false, message: '이미지 파일은 4MB 이하여야 합니다.' });
     }
     console.error('Image upload failed:', error);
     return sendJson(response, 500, { success: false, message: '이미지 업로드에 실패했습니다.' });
