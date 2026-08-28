@@ -2,6 +2,7 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import Home from './pages/Home'
+import SmoothScroll from './components/SmoothScroll'
 
 const Recruit = lazy(() => import('./pages/Recruit'))
 const Curriculum = lazy(() => import('./pages/Curriculum'))
@@ -22,6 +23,7 @@ function ScrollToTop() {
 export default function App() {
   return (
     <BrowserRouter>
+      <SmoothScroll />
       <ScrollToTop />
       <Suspense fallback={<div className='min-h-screen bg-[#1A1A1A]' />}>
         <Routes>
