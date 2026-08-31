@@ -29,6 +29,18 @@ import ProjectDetailModal from '../components/ProjectDetailModal'
 import ProjectFormModal from '../components/ProjectFormModal'
 import useProjects from '../hooks/useProjects'
 
+// 카드 이미지가 실제로 그려지는 폭. 아래 그리드와 카드 좌우 여백(37.5px * 2)에서
+// 나온 값이라 레이아웃을 바꾸면 여기도 같이 고쳐야 srcSet이 제 폭을 고른다.
+// 열 수는 getColumns()가 768 / 1280을 경계로 정하므로 미디어 쿼리도 같은 값을 쓴다.
+//   ~767   1열, main px-4 -> 100vw - 32 - 75 = 100vw - 107
+//   ~1279  2열, main px-6, gap-8 -> (100vw - 48 - 32) / 2 - 75 = 50vw - 115
+//   1280~  3열, max-w-7xl(1280) + lg:px-8, gap-8 -> (1216 - 64) / 3 - 75 = 309px
+//
+// 1024~1279는 lg:px-8이 먼저 걸려 실제로는 50vw - 123이라 위 식이 8px 크게 잡는다.
+// sizes는 실제보다 크게 잡히는 쪽이 안전해서(후보를 한 단계 크게 고른다) 그냥 둔다.
+const CARD_IMAGE_SIZES =
+  '(max-width: 767px) calc(100vw - 107px), (max-width: 1279px) calc(50vw - 115px), 309px'
+
 export default function Projects() {
   const [selectedGeneration, setSelectedGeneration] = useState('기수')
   const [showGenerationDropdown, setShowGenerationDropdown] = useState(false)
@@ -308,6 +320,8 @@ export default function Projects() {
                   {project.image ? (
                     <img
                       src={project.image}
+                      srcSet={project.cardSrcSet || undefined}
+                      sizes={CARD_IMAGE_SIZES}
                       alt={project.title}
                       loading='lazy'
                       decoding='async'

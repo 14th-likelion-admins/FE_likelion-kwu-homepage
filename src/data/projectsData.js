@@ -12,7 +12,12 @@
  * ============================================================================
  */
 
-import { projectImages, getProjectImage, getThumbnailImageSync } from './projectImages'
+import {
+  projectImages,
+  getProjectImage,
+  getProjectCardSrcSet,
+  getThumbnailImageSync,
+} from './projectImages'
 import registeredProjects from './registeredProjects.json'
 
 /**
@@ -80,6 +85,9 @@ const getStaticProjects = () => {
         tag: 'WEB',
         description: '프로젝트 한줄 소개',
         image: image,
+        // 카드용 축소본 srcSet. predefinedProjects는 이 기본값 위에 얕게 병합되므로
+        // 상세 정보가 있는 프로젝트도 이 값을 그대로 물려받는다.
+        cardSrcSet: getProjectCardSrcSet(projectId),
         thumbnail: getThumbnailImageSync(projectId),
         generation: '미지정',
         activity: '미지정',

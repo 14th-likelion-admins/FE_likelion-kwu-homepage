@@ -20,8 +20,13 @@
 
 ```bash
 pnpm add -D sharp
-pnpm run optimize:images
+pnpm run optimize:images        # 래스터 -> WebP 일괄 변환
+pnpm run images:card-variants  # /projects 카드용 축소본 생성
 ```
+
+`images:card-variants`는 실행할 때마다 기존 `projects-image-{N}-{폭}w.webp`를 지우고
+다시 만듭니다. 원본을 교체했다면 이 스크립트를 다시 돌려야 srcSet이 맞습니다.
+생성물(`src/assets/*-{폭}w.webp`, `src/data/projectImageWidths.json`)은 커밋합니다.
 
 작업이 끝나면 **`package.json`과 `pnpm-lock.yaml`을 반드시 되돌립니다.**
 그대로 커밋하면 sharp가 배포 의존성으로 들어갑니다.
@@ -31,11 +36,15 @@ git checkout -- package.json pnpm-lock.yaml
 pnpm install
 ```
 
+`git checkout`은 package.json의 다른 변경도 같이 되돌립니다. 스크립트 항목 등을
+함께 고쳤다면 sharp 항목만 지우고 `pnpm install`을 돌리세요.
+
 ## 스크립트
 
 | 파일 | 역할 |
 |---|---|
 | `optimize-images.mjs` | 정적 래스터 이미지를 WebP로 일괄 변환하고 용량 리포트를 남긴다 |
+| `generate-card-variants.mjs` | `projects-image-{N}.webp`에서 /projects 카드용 폭별 축소본과 원본 폭 매니페스트를 만든다 |
 | `analyze-noise.mjs` | 노이즈 텍스처가 균일한 그레인인지 통계로 판정한다 (타일링 가능 여부 판단용) |
 | `convert-phase-one.mjs` | 1차 대상 이미지들을 변환한다 |
 
