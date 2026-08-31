@@ -12,12 +12,7 @@
  * ============================================================================
  */
 
-import {
-  projectImages,
-  getProjectImage,
-  getProjectCardSrcSet,
-  getThumbnailImageSync,
-} from './projectImages'
+import { projectImages, getProjectImage, getProjectCardSrcSet } from './projectImages'
 import registeredProjects from './registeredProjects.json'
 
 /**
@@ -88,7 +83,6 @@ const getStaticProjects = () => {
         // 카드용 축소본 srcSet. predefinedProjects는 이 기본값 위에 얕게 병합되므로
         // 상세 정보가 있는 프로젝트도 이 값을 그대로 물려받는다.
         cardSrcSet: getProjectCardSrcSet(projectId),
-        thumbnail: getThumbnailImageSync(projectId),
         generation: '미지정',
         activity: '미지정',
         detail: {
@@ -119,7 +113,6 @@ const getStaticProjects = () => {
       tag: 'WEB',
       description: 'AI 유기동물 맞춤 추천 서비스',
       image: getProjectImage(17),
-      thumbnail: getThumbnailImageSync(17),
       detail: {
         thumbnail: getProjectImage(17),
         overview: `**RE:born**은 사용자의 관심사와 행동 패턴을 학습하여 개인에게 가장 적합한 유기동물을 추천하는 **AI 기반 매칭 서비스**입니다.
@@ -152,7 +145,6 @@ AI 추천과 정보 통합을 통해 유기동물 입양 과정을 보다 쉽고
       tag: 'WEB',
       description: 'AI 디지털 범죄 사전 탐지 플랫폼',
       image: getProjectImage(16),
-      thumbnail: getThumbnailImageSync(16),
       detail: {
         thumbnail: getProjectImage(16),
         overview: `SafeScan은 공공데이터와 실시간 사용자 제보를 기반으로 보이스피싱, 가짜 채용, 스미싱 등 디지털 접촉 기반 점죄를 사전에 탐지, 공유하여 예방하는 안전 플랫폼입니다.
@@ -186,7 +178,6 @@ SafeScan은 이러한 문제를 해결하기 위해 공공데이터 API를 활�
       tag: 'WEB',
       description: '주민 참여 안전 지도 서비스',
       image: getProjectImage(15),
-      thumbnail: getThumbnailImageSync(15),
       detail: {
         thumbnail: getProjectImage(15),
         overview: `저희는 현대인이 느끼는 생활 불안을 탐색하던 중 ‘안전 정보의 단절’이라는 문제에 주목했고, 주민과 공공데이터를 연결한 참여형 안전 지도 서비스 ‘살펴’를 기획하게 되었습니다.
@@ -221,7 +212,6 @@ SafeScan은 이러한 문제를 해결하기 위해 공공데이터 API를 활�
       tag: 'WEB',
       description: '과잉진료 분석 서비스',
       image: getProjectImage(14),
-      thumbnail: getThumbnailImageSync(14),
       detail: {
         thumbnail: getProjectImage(14),
         overview: `**과잉제로**는 공공데이터를 기반으로 사용자가 받은 진료와 처방이 의학적으로 정상 범위인지, 과잉진료 가능성이 있는지를 비교·분석해주는 헬스케어 서비스입니다.
@@ -253,7 +243,6 @@ SafeScan은 이러한 문제를 해결하기 위해 공공데이터 API를 활�
       tag: 'WEB',
       description: 'SNS 프로모션 플랫폼',
       image: getProjectImage(13),
-      thumbnail: getThumbnailImageSync(13),
       detail: {
         thumbnail: getProjectImage(13),
         overview: `**FeedUp**은 디지털 홍보에 익숙하지 않은 자영업자와 콘텐츠 생산에 친숙한 대학생을 연결하는 **세대 연결형 SNS 프로모션 플랫폼**입니다.
@@ -283,7 +272,6 @@ SafeScan은 이러한 문제를 해결하기 위해 공공데이터 API를 활�
       tag: 'APP',
       description: 'AI 기반 부동산 계약 해설 서비스',
       image: getProjectImage(12),
-      thumbnail: getThumbnailImageSync(12),
       detail: {
         thumbnail: getProjectImage(12),
         overview: `한집말이는 외국인 거주자가 한국의 부동산 계약 과정에서 언어·법률 장벽으로 인해 불리한 위치에 놓이지 않도록 돕는 AI 기반 계약 해설 서비스입니다. 단순 통역이나 동행을 넘어, 사용자가 계약서를 스스로 읽고 이해하며 판단할 수 있도록 지원하는 것을 핵심 가치로 합니다.
@@ -313,7 +301,6 @@ SafeScan은 이러한 문제를 해결하기 위해 공공데이터 API를 활�
       tag: 'APP',
       description: '음성 기반 AI 민원 가이드 서비스',
       image: getProjectImage(11),
-      thumbnail: getThumbnailImageSync(11),
       detail: {
         thumbnail: getProjectImage(11),
         overview: `**손주AI**는 디지털 민원 서비스 이용에 어려움을 겪는 고령층을 위해 **음성 기반으로 민원 접수와 안내를 제공하는 AI 민원 가이드 서비스**입니다.
@@ -348,7 +335,6 @@ SafeScan은 이러한 문제를 해결하기 위해 공공데이터 API를 활�
       tag: 'APP',
       description: 'AI 기반 절약 챌린지',
       image: getProjectImage(10),
-      thumbnail: getThumbnailImageSync(10),
       detail: {
         thumbnail: getProjectImage(10),
         overview: `**슬금(SLGM)**은 대학생의 절약 습관 형성과 학교 주변 **지역 상권 활성화**를 동시에 목표로 하는 **AI 기반 맞춤형 소비 관리 서비스**입니다.
@@ -382,7 +368,6 @@ SafeScan은 이러한 문제를 해결하기 위해 공공데이터 API를 활�
       tag: 'APP',
       description: 'AI 기반 교통 동행 서비스',
       image: getProjectImage(9),
-      thumbnail: getThumbnailImageSync(9),
       detail: {
         thumbnail: getProjectImage(9),
         overview: `**손주**는 대중교통 이용에 어려움을 겪는 고령층과 부모님의 이동을 걱정하는 보호자를 위해 설계된 **AI 기반 교통 동행 서비스**입니다.
@@ -419,7 +404,6 @@ SafeScan은 이러한 문제를 해결하기 위해 공공데이터 API를 활�
       tag: 'APP',
       description: 'AI 기반 유기동물 맞춤 추천 서비스',
       image: getProjectImage(8),
-      thumbnail: getThumbnailImageSync(8),
       detail: {
         thumbnail: getProjectImage(8),
         overview: `**유기동물 AI 추천 시스템**은 사용자의 관심사와 행동 패턴을 학습하여 개인에게 가장 적합한 유기동물을 추천하는 **AI 기반 매칭 서비스**입니다.
@@ -453,7 +437,6 @@ SafeScan은 이러한 문제를 해결하기 위해 공공데이터 API를 활�
       tag: 'APP',
       description: '외국인 유학생을 위한 주거 서비스',
       image: getProjectImage(7),
-      thumbnail: getThumbnailImageSync(7),
       detail: {
         thumbnail: getProjectImage(7),
         overview: `**Room-Mate**는 외국인 유학생이 한국에서 집을 구하는 과정에서 반복적으로 겪는 **언어 장벽**과 **주거 제도 이해 부족** 문제를 해결하기 위한 **주거 통합 지원 AI 서비스**입니다.
@@ -488,7 +471,6 @@ SafeScan은 이러한 문제를 해결하기 위해 공공데이터 API를 활�
       tag: 'APP',
       description: 'AI 기반 일기 작성 서비스',
       image: getProjectImage(6),
-      thumbnail: getThumbnailImageSync(6),
       detail: {
         thumbnail: getProjectImage(6),
         overview: `**오늘의 나**는 사용자에게 개인화된 대화형 인터페이스를 통해 쉽고 꾸준하게 일기를 작성할 수 있도록 돕는 **AI 기반 일기 작성 서비스입니다.** 사용자 본연의 생각과 감정을 부담 없이 기록하고, 삶의 중요한 순간들을 체계적으로 관리하는 것을 목표로 합니다.
@@ -517,7 +499,6 @@ SafeScan은 이러한 문제를 해결하기 위해 공공데이터 API를 활�
       tag: 'APP',
       description: '광운대 맞춤 예비군 이동/모집 서비스',
       image: getProjectImage(5),
-      thumbnail: getThumbnailImageSync(5),
       detail: {
         thumbnail: getProjectImage(5),
         overview: `광운대학교의 특성을 고려한 서비스를 개발하는 과정에서, 남학생 비율이 높다는 점에 주목하게 되었습니다. 남학생들에게 있어서 군대는 필수적이고, 이는 예비군 훈련과 이어지게 됩니다. 광운대학교의 예비군 훈련소로 가는 길이 쉽지만은 않습니다. 교통 수단도 불편하며 사람들도 많기 때문에 시간과 피로도가 만만치 않다고 직접 느꼈으며 주변에서도 듣는 주된 문제 사항이었습니다. 광운대학교에서 금곡예비군훈련장까지는 대중교통으로 약 1시간이 소요되며, 귀가 시에는 더 많은 시간이 걸리는 것으로 나타났습니다.
@@ -543,7 +524,6 @@ SafeScan은 이러한 문제를 해결하기 위해 공공데이터 API를 활�
       tag: 'APP',
       description: 'Not-Todo List 습관 개선 서비스',
       image: getProjectImage(4),
-      thumbnail: getThumbnailImageSync(4),
       detail: {
         thumbnail: getProjectImage(4),
         overview: `기존의 투두리스트를 변형하여, 하지 말아야 할 일들을 기록하는 새로운 접근 방식을 고려해보고자 했습니다. 이를 구체화하여 안 좋은 습관들을 개선하기 위한 'Not-Todo List' 서비스를 고안했습니다.
@@ -570,7 +550,6 @@ SafeScan은 이러한 문제를 해결하기 위해 공공데이터 API를 활�
       tag: 'APP',
       description: '감정 메타인지 기반 자기성찰 서비스',
       image: getProjectImage(3),
-      thumbnail: getThumbnailImageSync(3),
       detail: {
         thumbnail: getProjectImage(3),
         overview: `팀 메타몽의 서비스 메모리는 메타인지라는 키워드로 시작한 서비스였습니다.
@@ -595,7 +574,6 @@ SafeScan은 이러한 문제를 해결하기 위해 공공데이터 API를 활�
       tag: 'APP',
       description: '처방전 및 의약품 분석 서비스 ',
       image: getProjectImage(2),
-      thumbnail: getThumbnailImageSync(2),
       detail: {
         thumbnail: getProjectImage(2),
         overview: `의약품 정보 접근성과 신뢰할 수 있는 건강 정보 획득의 어려움을 해결하기 위한 혁신적인 서비스를 개발했습니다.
@@ -620,7 +598,6 @@ SafeScan은 이러한 문제를 해결하기 위해 공공데이터 API를 활�
       tag: 'APP',
       description: '가족 건강 관리 및 소통 촉진 서비스',
       image: getProjectImage(1),
-      thumbnail: getThumbnailImageSync(1),
       detail: {
         thumbnail: getProjectImage(1),
         overview: `아이디어톤의 주제는 ‘IT 기술을 활용하여 현대인의 건강 문제를 해결할 수 있는 아이디어’ 이었습니다. 저희는 ‘현대인’의 특징이 무엇이 있을까 고려하며 어떤 서비스들이 있는지부터 찾아보았습니다. 주로 20-30대를 타겟층으로 하는 다양한 서비스들이 많았으며 개인을 위한 서비스가 대부분이었습니다.
@@ -670,21 +647,3 @@ SafeScan은 이러한 문제를 해결하기 위해 공공데이터 API를 활�
  */
 export const getAllProjects = () => [...registeredProjects, ...getStaticProjects()]
 
-/**
- * 최신 프로젝트 N개를 가져오는 함수
- * 
- * ProjectsHome에서 사용되며, 숫자가 가장 큰 프로젝트 N개를 반환합니다.
- * getAllProjects()가 이미 id 내림차순으로 정렬되어 있으므로 상위 N개를 반환합니다.
- * 
- * @param {number} count - 가져올 프로젝트 개수 (기본값: 5)
- * @returns {Array} 최신 프로젝트 배열
- * 
- * 사용 예시:
- * - getLatestProjects(5) // 최신 프로젝트 5개
- * - getLatestProjects(10) // 최신 프로젝트 10개
- */
-export const getLatestProjects = (count = 5) => {
-  const allProjects = getAllProjects()
-  // 이미 id 내림차순으로 정렬되어 있으므로 상위 count개 반환
-  return allProjects.slice(0, count)
-}

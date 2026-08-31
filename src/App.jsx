@@ -8,7 +8,6 @@ const Recruit = lazy(() => import('./pages/Recruit'))
 const Curriculum = lazy(() => import('./pages/Curriculum'))
 const Activities = lazy(() => import('./pages/Activities'))
 const Projects = lazy(() => import('./pages/Projects'))
-const ProjectsHome = lazy(() => import('./pages/ProjectsHome'))
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -33,11 +32,11 @@ export default function App() {
           <Route path='/recruit' element={<Recruit />} />
           <Route path='/curriculum/:track' element={<Curriculum />} />
 
-          {/* 프로젝트 홈 */}
-          <Route path='/projectshome' element={<ProjectsHome />} />
-
           {/* 프로젝트 리스트 */}
           <Route path='/projects' element={<Projects />} />
+
+          {/* 옛 프로젝트 홈. 북마크와 외부 링크가 살아 있어 리다이렉트만 남긴다 */}
+          <Route path='/projectshome' element={<Navigate to='/projects' replace />} />
 
           {/*그 외 모든 경로 Home */}
           <Route path='*' element={<Navigate to='/' replace />} />
