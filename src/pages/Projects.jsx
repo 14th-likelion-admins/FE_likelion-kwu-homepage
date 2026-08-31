@@ -22,7 +22,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import ProjectDetailModal from '../components/ProjectDetailModal'
@@ -170,32 +170,8 @@ export default function Projects() {
       <Header />
 
       <main className='relative px-4 pt-12 pb-16 mx-auto md:pt-20 md:px-6 lg:px-8 max-w-7xl'>
-        {/* 제목과 뒤로가기 버튼 */}
+        {/* 페이지 제목 */}
         <div className='flex items-center gap-4 mt-4 mb-6 md:mb-12 md:mt-12'>
-          <Link
-            to='/projectshome'
-            className='items-center justify-center flex-shrink-0 hidden md:flex'
-            style={{
-              width: '24px',
-              height: '24px',
-            }}
-          >
-            <svg
-              width='24'
-              height='24'
-              viewBox='0 0 24 24'
-              fill='none'
-              xmlns='http://www.w3.org/2000/svg'
-            >
-              <path
-                d='M15 18L9 12L15 6'
-                stroke='white'
-                strokeWidth='2'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-              />
-            </svg>
-          </Link>
           <h2
             className='hidden m-0 text-lg font-bold md:block md:text-xl lg:text-2xl'
             style={{

@@ -90,7 +90,7 @@ export default function Activities() {
   )
 
   const selectCard = (cardId) => {
-    if (cardId === 'project') { navigate('/projectshome'); return }
+    if (cardId === 'project') { navigate('/projects'); return }
     setSelectedActivity(cardId); setSelectedGeneration(14)
   }
   const selectGeneration = (generation) => {

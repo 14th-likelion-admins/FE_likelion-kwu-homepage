@@ -208,7 +208,6 @@ export default function ProjectFormModal({ isOpen, onClose, onCreated }) {
         generation: payload.generation,
         activity: payload.activity,
         image: uploadedImageUrls[0],
-        thumbnail: uploadedImageUrls[0],
         detail: {
           thumbnail: uploadedImageUrls[0],
           images: uploadedImageUrls,

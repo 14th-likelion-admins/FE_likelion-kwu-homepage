@@ -33,7 +33,6 @@ export default async function handler(request, response) {
       generation,
       activity,
       image: images[0],
-      thumbnail: images[0],
       detail: { thumbnail: images[0], images, overview, features },
     });
 

@@ -1,5 +1,5 @@
 // src/components/Header.jsx
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 import logo from '../assets/kw-logo.webp'
 
@@ -9,14 +9,6 @@ export default function Header() {
   const [mobileAboutOpen, setMobileAboutOpen] = useState(false)
   const aboutRef = useRef(null)
   const mobileMenuRef = useRef(null)
-  const navigate = useNavigate()
-
-  const handleProjectClick = (event) => {
-    if (window.innerWidth < 768) {
-      event.preventDefault()
-      navigate('/projects')
-    }
-  }
 
   useEffect(() => {
     const onClickOutside = (event) => {
@@ -85,7 +77,7 @@ export default function Header() {
             <Link to='/recruit' className='hover:text-orange-400'>
               RECRUIT
             </Link>
-            <Link to='/projectshome' onClick={handleProjectClick} className='hover:text-orange-400'>
+            <Link to='/projects' className='hover:text-orange-400'>
               PROJECT
             </Link>
           </nav>
@@ -160,11 +152,8 @@ export default function Header() {
                   RECRUIT
                 </Link>
                 <Link
-                  to='/projectshome'
-                  onClick={(e) => {
-                    handleProjectClick(e)
-                    setMobileMenuOpen(false)
-                  }}
+                  to='/projects'
+                  onClick={() => setMobileMenuOpen(false)}
                   className='block px-2 py-2 text-white hover:text-orange-400'
                 >
                   PROJECT
