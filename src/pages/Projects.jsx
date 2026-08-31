@@ -1,24 +1,16 @@
 /**
  * ============================================================================
- * Projects.jsx - 프로젝트 목록 페이지 (Updated)
+ * Projects.jsx - 프로젝트 목록 페이지
  *
- * 이 파일은 프로젝트 목록을 표시하고, 필터링 및 무한 스크롤 기능을 제공하는
- * 페이지입니다. 기존 구현에서 기수와 활동 드롭다운의 모서리 둥글기와
- * 가로 크기를 조절하여 보다 깔끔한 UI를 구현합니다.
+ * 페이지 맨 위는 배너 이미지 한 장이 전부다. 배너에 문구가 이미 새겨져 있어서
+ * 페이지 쪽에는 제목 텍스트를 두지 않는다(오버레이하면 두 번 읽힌다).
+ * 목록 시트는 배너 위로 조금 올라와 둥근 모서리로 겹치게 두어, 배너와 목록이
+ * 한 덩어리로 보이게 한다.
  *
- * 변경 사항:
- * 1. 기수 드롭다운의 각 항목 모서리 둥글기를 "기수" 버튼의 둥글기와
- *    비슷한 정도로 줄여 좀 더 각진 느낌이 들도록 수정했습니다. 각 항목에
- *    불필요한 `rounded-full` 클래스를 제거하고, 첫 번째와 마지막 항목에만
- *    작은 반경(`rounded-t-lg` 및 `rounded-b-lg`)을 부여했습니다. 전체
- *    드롭다운 박스에는 `rounded-lg`를 적용해 버튼과 유사한 외형을 유지합니다.
- *
- * 2. 활동 드롭다운의 드롭다운 박스는 좌측 기준 위치를 유지한 채 우측으로만
- *    넓어지도록 `whiteSpace: 'nowrap'`과 `minWidth: '150px'` 스타일을
- *    추가했습니다. 이를 통해 긴 항목 이름(예: "권역별 연합해커톤")도 줄바꿈
- *    없이 깔끔하게 표시됩니다. 이 드롭다운 역시 모서리 둥글기를 줄여
- *    `rounded-lg`를 사용하고, 각 항목에는 `rounded-t-lg`, `rounded-b-lg`
- *    클래스를 적용했습니다.
+ * 기수 필터는 드롭다운이 아니라 한 줄 pill로 모두 펼쳐 둔다. 기수는 예닐곱 개뿐이라
+ * 접어 둘 이유가 없고, 지금 어떤 기수를 보고 있는지도 한눈에 보인다.
+ * 프로젝트 등록은 같은 줄 오른쪽 끝에 아웃라인 없는 텍스트 버튼으로 두어,
+ * 필터 pill과 성격이 다른 동작임을 외형으로 구분한다.
  */
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
@@ -28,22 +20,28 @@ import Footer from '../components/Footer'
 import ProjectDetailModal from '../components/ProjectDetailModal'
 import ProjectFormModal from '../components/ProjectFormModal'
 import useProjects from '../hooks/useProjects'
+import heroBanner960 from '../assets/projects-hero-banner-960w.webp'
+import heroBanner1600 from '../assets/projects-hero-banner-1600w.webp'
+import heroBanner2400 from '../assets/projects-hero-banner-2400w.webp'
 
-// 카드 이미지가 실제로 그려지는 폭. 아래 그리드와 카드 좌우 여백(37.5px * 2)에서
-// 나온 값이라 레이아웃을 바꾸면 여기도 같이 고쳐야 srcSet이 제 폭을 고른다.
+// 카드 이미지가 실제로 그려지는 폭. 카드는 이미지가 카드 폭을 꽉 채우므로
+// 아래 그리드의 컨테이너 좌우 여백과 gap만 빼면 된다.
 // 열 수는 getColumns()가 768 / 1280을 경계로 정하므로 미디어 쿼리도 같은 값을 쓴다.
-//   ~767   1열, main px-4 -> 100vw - 32 - 75 = 100vw - 107
-//   ~1279  2열, main px-6, gap-8 -> (100vw - 48 - 32) / 2 - 75 = 50vw - 115
-//   1280~  3열, max-w-7xl(1280) + lg:px-8, gap-8 -> (1216 - 64) / 3 - 75 = 309px
+//   ~767   1열, 컨테이너 px-4 -> 100vw - 32
+//   ~1279  2열, 컨테이너 px-6, gap-8 -> (100vw - 48 - 32) / 2 = 50vw - 40
+//   1280~  3열, max-w-7xl(1280) + lg:px-8, gap-8 -> (1216 - 64) / 3 = 384px
 //
-// 1024~1279는 lg:px-8이 먼저 걸려 실제로는 50vw - 123이라 위 식이 8px 크게 잡는다.
+// 1024~1279는 lg:px-8이 먼저 걸려 실제로는 50vw - 48이라 위 식이 8px 크게 잡는다.
 // sizes는 실제보다 크게 잡히는 쪽이 안전해서(후보를 한 단계 크게 고른다) 그냥 둔다.
 const CARD_IMAGE_SIZES =
-  '(max-width: 767px) calc(100vw - 107px), (max-width: 1279px) calc(50vw - 115px), 309px'
+  '(max-width: 767px) calc(100vw - 32px), (max-width: 1279px) calc(50vw - 40px), 384px'
+
+// 배너 원본 비율(11511 x 2447). 좁은 화면에서 비율대로 두면 띠가 너무 얇아지므로
+// 최소 높이를 주고, 잘릴 때는 문구가 있는 왼쪽을 남긴다.
+const HERO_ASPECT = '11511 / 2447'
 
 export default function Projects() {
-  const [selectedGeneration, setSelectedGeneration] = useState('기수')
-  const [showGenerationDropdown, setShowGenerationDropdown] = useState(false)
+  const [selectedGeneration, setSelectedGeneration] = useState('전체')
   const [displayedProjects, setDisplayedProjects] = useState(12) // 초기 표시 개수
   const [isLoading, setIsLoading] = useState(false)
   const observerTarget = useRef(null)
@@ -83,14 +81,8 @@ export default function Projects() {
   }, [])
 
   const filteredProjects = useMemo(() => {
-    return allProjects.filter((project) => {
-      const genMatch =
-        selectedGeneration === '기수' ||
-        selectedGeneration === '전체' ||
-        project.generation === selectedGeneration
-      const actMatch = true
-      return genMatch && actMatch
-    })
+    if (selectedGeneration === '전체') return allProjects
+    return allProjects.filter((project) => project.generation === selectedGeneration)
   }, [allProjects, selectedGeneration])
 
   // 필터 변경 시 표시 개수 초기화
@@ -126,17 +118,6 @@ export default function Projects() {
     }
   }, [displayedProjects, filteredProjects.length, loadMoreProjects])
 
-  // 외부 클릭 시 드롭다운 닫기
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!event.target.closest('.dropdown-container')) {
-        setShowGenerationDropdown(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
-  }, [])
-
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
@@ -169,199 +150,168 @@ export default function Projects() {
     >
       <Header />
 
-      <main className='relative px-4 pt-12 pb-16 mx-auto md:pt-20 md:px-6 lg:px-8 max-w-7xl'>
-        {/* 페이지 제목 */}
-        <div className='flex items-center gap-4 mt-4 mb-6 md:mb-12 md:mt-12'>
-          <h2
-            className='hidden m-0 text-lg font-bold md:block md:text-xl lg:text-2xl'
-            style={{
-              fontFamily: "'Space Grotesk', Helvetica, sans-serif",
-              lineHeight: '1.2',
-            }}
-          >
-            멋쟁이사자처럼에서 진행된 프로젝트
-          </h2>
-        </div>
+      <main className='relative'>
+        {/* 상단 배너 - 문구가 이미지 안에 있어 별도 텍스트를 얹지 않는다.
+            pt는 fixed 헤더 높이(모바일 44px, 데스크탑 52px)만큼만 비운다. */}
+        <section className='pt-11 md:pt-[52px]'>
+          <img
+            src={heroBanner2400}
+            srcSet={`${heroBanner960} 960w, ${heroBanner1600} 1600w, ${heroBanner2400} 2400w`}
+            sizes='100vw'
+            alt='ANIMAL LEAGUE'
+            width='2400'
+            height='510'
+            fetchPriority='high'
+            decoding='async'
+            className='block w-full object-cover object-left min-h-[130px] md:min-h-0'
+            style={{ aspectRatio: HERO_ASPECT }}
+          />
+        </section>
 
-        {/* 드롭다운 필터 */}
-        <div className='flex flex-wrap gap-4 pl-0 mt-6 mb-6'>
-          {/* 기수 드롭다운 */}
-          <div className='relative dropdown-container'>
-            <button
-              onClick={() => {
-                setShowGenerationDropdown(!showGenerationDropdown)
-              }}
-              className='border border-white rounded-full px-4 py-2 flex items-center justify-center gap-3 bg-[#1A1A1A] hover:bg-white/10 transition-colors'
+        {/* 목록 시트 - 배너 위로 겹쳐 올려 둥근 모서리로 이어 붙인다 */}
+        <section className='relative z-10 -mt-6 md:-mt-10 rounded-t-[28px] md:rounded-t-[44px] bg-[#1A1A1A]'>
+          <div className='px-4 pt-8 pb-16 mx-auto md:px-6 lg:px-8 max-w-7xl md:pt-12'>
+            {/* 기수 필터 + 프로젝트 등록 */}
+            <div className='flex items-center gap-4 pb-4 mb-8 border-b md:pb-5 md:mb-10 border-white/15'>
+              <div
+                className='flex items-center flex-1 min-w-0 gap-1 overflow-x-auto md:gap-2 [&::-webkit-scrollbar]:hidden'
+                style={{ scrollbarWidth: 'none' }}
+              >
+                {generations.map((gen) => {
+                  const isSelected = selectedGeneration === gen
+                  return (
+                    <button
+                      key={gen}
+                      type='button'
+                      aria-pressed={isSelected}
+                      onClick={() => {
+                        setSelectedGeneration(gen)
+                        setDisplayedProjects(12)
+                      }}
+                      className={`flex-shrink-0 rounded-full px-4 py-2 md:px-5 transition-colors ${
+                        isSelected
+                          ? 'bg-white text-[#1A1A1A]'
+                          : 'text-white/45 hover:text-white hover:bg-white/10'
+                      }`}
+                      style={{
+                        fontFamily: "'Space Grotesk', Helvetica, sans-serif",
+                        fontSize: 'clamp(13px, 1vw, 16px)',
+                        fontWeight: isSelected ? 600 : 400,
+                        whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {gen}
+                    </button>
+                  )
+                })}
+              </div>
+
+              <button
+                type='button'
+                onClick={() => setIsFormOpen(true)}
+                className='flex-shrink-0 py-2 transition-colors text-white/60 hover:text-white'
+                style={{
+                  fontFamily: "'Space Grotesk', Helvetica, sans-serif",
+                  fontSize: 'clamp(13px, 1vw, 16px)',
+                  fontWeight: 400,
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                + 프로젝트 등록
+              </button>
+            </div>
+
+            {/* 프로젝트 그리드 */}
+            <div
+              className='grid gap-6 md:gap-8'
               style={{
-                fontFamily: "'Space Grotesk', Helvetica, sans-serif",
-                fontSize: 'clamp(12px, 1vw, 16px)',
-                fontWeight: 300,
-                minWidth: '100px',
+                gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
               }}
             >
-              <span>{selectedGeneration}</span>
-              <svg
-                width='20'
-                height='20'
-                viewBox='0 0 24 24'
-                fill='none'
-                xmlns='http://www.w3.org/2000/svg'
-                style={{ transform: 'rotate(90deg)' }}
-              >
-                <path
-                  d='M9 18L15 12L9 6'
-                  stroke='white'
-                  strokeWidth='2'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                />
-              </svg>
-            </button>
-            {showGenerationDropdown && (
-              <div
-                className='absolute mt-2 border border-white rounded-2xl bg-[#1A1A1A] z-50 min-w-full shadow-lg'
-                style={{ overflow: 'visible' }}
-              >
-                {generations.map((gen) => (
-                  <button
-                    key={gen}
-                    onClick={() => {
-                      setSelectedGeneration(gen)
-                      setDisplayedProjects(12)
-                      setShowGenerationDropdown(false)
-                    }}
-                    className='w-full px-6 py-3 text-center transition-colors md:px-8 md:py-4 hover:bg-white/10 first:rounded-t-lg last:rounded-b-lg'
-                    style={{
-                      fontFamily: "'Space Grotesk', Helvetica, sans-serif",
-                      fontSize: 'clamp(12px, 1vw, 16px)',
-                      fontWeight: 300,
-                    }}
+              {visibleProjects.map((project) => (
+                <div
+                  key={project.id}
+                  id={`project-${project.id}`}
+                  className='border border-white/10 rounded-3xl bg-white/[0.04] overflow-hidden hover:border-white/40 transition-colors cursor-pointer'
+                  onClick={() => {
+                    setSelectedProject(project)
+                    setIsModalOpen(true)
+                  }}
+                >
+                  {/* 프로젝트 이미지 - 카드 폭을 꽉 채운다 */}
+                  <div
+                    className='w-full overflow-hidden bg-[#111111]'
+                    style={{ aspectRatio: '375 / 211' }}
                   >
-                    {gen}
-                  </button>
-                ))}
+                    {project.image ? (
+                      <img
+                        src={project.image}
+                        srcSet={project.cardSrcSet || undefined}
+                        sizes={CARD_IMAGE_SIZES}
+                        alt={project.title}
+                        loading='lazy'
+                        decoding='async'
+                        className='object-cover w-full h-full'
+                      />
+                    ) : (
+                      <div className='flex items-center justify-center w-full h-full text-sm text-white/30'>
+                        이미지 없음
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 프로젝트 정보 */}
+                  <div className='p-5 md:p-6'>
+                    {/* 프로젝트 제목과 태그 */}
+                    <div className='flex items-end gap-3 mb-3'>
+                      <span
+                        className='text-white'
+                        style={{
+                          fontFamily: "'Inter', sans-serif",
+                          fontSize: 'clamp(20px, 2.5vw, 24px)',
+                          lineHeight: '1.2',
+                          fontWeight: 600,
+                        }}
+                      >
+                        {project.title}
+                      </span>
+                      <span
+                        className='font-bold text-white/40'
+                        style={{
+                          fontFamily: "'Inter', sans-serif",
+                          fontSize: 'clamp(13px, 1.6vw, 16px)',
+                          lineHeight: '1.4',
+                        }}
+                      >
+                        {project.tag}
+                      </span>
+                    </div>
+
+                    {/* 프로젝트 설명 */}
+                    <p
+                      className='text-white/60'
+                      style={{
+                        fontFamily: "'Inter', sans-serif",
+                        fontWeight: 400,
+                        fontSize: 'clamp(14px, 1.6vw, 16px)',
+                        lineHeight: '1.5',
+                      }}
+                    >
+                      {project.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* 무한스크롤 감지 요소 */}
+            {displayedProjects < filteredProjects.length && (
+              <div ref={observerTarget} className='flex items-center justify-center py-8'>
+                {isLoading && <div className='text-white/50'>로딩 중...</div>}
               </div>
             )}
           </div>
-
-          {/* 활동 드롭다운 (삭제됨) */}
-
-          {/* 프로젝트 등록 버튼 */}
-          <button
-            type='button'
-            onClick={() => setIsFormOpen(true)}
-            className='border border-white rounded-full px-4 py-2 flex items-center justify-center gap-2 bg-[#1A1A1A] hover:bg-white/10 transition-colors'
-            style={{
-              fontFamily: "'Space Grotesk', Helvetica, sans-serif",
-              fontSize: 'clamp(12px, 1vw, 16px)',
-              fontWeight: 300,
-            }}
-          >
-            + 프로젝트 등록
-          </button>
-        </div>
-
-        {/* 프로젝트 그리드 */}
-        <div
-          className='grid gap-6 md:gap-8'
-          style={{
-            gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
-          }}
-        >
-          {visibleProjects.map((project) => (
-            <div
-              key={project.id}
-              id={`project-${project.id}`}
-              className='border border-white/50 rounded-3xl bg-[#1A1A1A] overflow-hidden hover:border-white transition-colors cursor-pointer'
-              onClick={() => {
-                setSelectedProject(project)
-                setIsModalOpen(true)
-              }}
-            >
-              {/* 프로젝트 이미지 컨테이너 - 좌우여백 37.5, 상단 여백 34 */}
-              <div
-                className='relative'
-                style={{
-                  paddingLeft: '37.5px',
-                  paddingRight: '37.5px',
-                  paddingTop: '34px',
-                }}
-              >
-                <div
-                  className='w-full border border-white rounded-3xl overflow-hidden bg-[#1A1A1A]'
-                  style={{
-                    aspectRatio: '375 / 211',
-                  }}
-                >
-                  {project.image ? (
-                    <img
-                      src={project.image}
-                      srcSet={project.cardSrcSet || undefined}
-                      sizes={CARD_IMAGE_SIZES}
-                      alt={project.title}
-                      loading='lazy'
-                      decoding='async'
-                      className='object-cover w-full h-full'
-                    />
-                  ) : (
-                    <div className='flex items-center justify-center w-full h-full text-sm text-white/30'>
-                      이미지 없음
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* 프로젝트 정보 */}
-              <div className='p-6 md:p-8'>
-                {/* 프로젝트 제목과 태그 */}
-                <div className='flex items-end gap-0 mb-4'>
-                  <span
-                    className='text-white'
-                    style={{
-                      fontFamily: "'Inter', sans-serif",
-                      fontSize: 'clamp(20px, 2.5vw, 24px)',
-                      lineHeight: '1.2',
-                      fontWeight: 500,
-                    }}
-                  >
-                    {project.title}
-                  </span>
-                  <span
-                    className='font-bold text-white/50'
-                    style={{
-                      fontFamily: "'Inter', sans-serif",
-                      fontSize: 'clamp(14px, 1.8vw, 18px)',
-                      lineHeight: '1.2',
-                      marginLeft: '20px',
-                    }}
-                  >
-                    {project.tag}
-                  </span>
-                </div>
-
-                {/* 프로젝트 설명 */}
-                <p
-                  className='text-white'
-                  style={{
-                    fontFamily: "'Inter', sans-serif",
-                    fontWeight: 400,
-                    fontSize: 'clamp(16px, 2vw, 20px)',
-                    lineHeight: '1.2',
-                  }}
-                >
-                  {project.description}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* 무한스크롤 감지 요소 */}
-        {displayedProjects < allProjects.length && (
-          <div ref={observerTarget} className='flex items-center justify-center py-8'>
-            {isLoading && <div className='text-white/50'>로딩 중...</div>}
-          </div>
-        )}
+        </section>
 
         {/* UP 버튼 */}
         <button

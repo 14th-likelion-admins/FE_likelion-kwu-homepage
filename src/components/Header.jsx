@@ -31,7 +31,9 @@ export default function Header() {
         className='fixed top-0 left-0 z-50 w-full backdrop-blur'
         style={{ backgroundColor: '#1A1A1A' }}
       >
-        <div className='mx-auto flex max-w-7xl items-center justify-between px-4 py-1.5 md:py-2.5'>
+        {/* max-w-7xl로 가운데 모으면 넓은 화면에서 로고와 메뉴가 화면 중앙 쪽으로
+            몰려 보인다. 헤더는 폭을 제한하지 않고 좌우 끝에 붙인다. */}
+        <div className='flex w-full items-center justify-between px-4 py-1.5 md:px-8 md:py-2.5'>
           <Link to='/' className='flex items-center gap-2'>
             <img
               src={logo}
