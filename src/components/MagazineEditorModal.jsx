@@ -92,12 +92,7 @@ function ItemCard({ item, row, rowIndex, uploadingId, actions }) {
       </div>
 
       {item.type === 'text' ? (
-        <>
-          <select value={item.style} onChange={(event) => actions.update(item.id, { style: event.target.value })} className='mb-3 rounded border border-white/25 bg-[#191c20] px-2 py-1 text-sm'>
-            <option value='paragraph'>문단</option><option value='heading'>제목</option>
-          </select>
-          <textarea value={item.text} onChange={(event) => actions.update(item.id, { text: event.target.value })} placeholder='내용을 입력하세요. 마크다운을 쓸 수 있어요: **굵게**, *기울임*, [링크](https://...), - 목록' rows='4' className='w-full resize-y rounded-lg border border-white/25 bg-white/10 p-3 text-white placeholder:text-white/40' />
-        </>
+        <textarea value={item.text} onChange={(event) => actions.update(item.id, { text: event.target.value })} placeholder='내용을 입력하세요. 마크다운을 쓸 수 있어요: **굵게**, *기울임*, [링크](https://...), - 목록' rows='4' className='w-full resize-y rounded-lg border border-white/25 bg-white/10 p-3 text-white placeholder:text-white/40' />
       ) : (
         <div className='space-y-3'>
           <input type='file' accept='image/*' onChange={(event) => actions.selectImage(item.id, event.target.files?.[0], event.target)} disabled={uploadingId === item.id} className='block w-full text-sm text-white/75 file:mr-3 file:rounded file:border-0 file:bg-orange-300 file:px-3 file:py-1 file:text-[#111315]' />
@@ -310,7 +305,7 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
           <button type='button' onClick={onClose} className='text-2xl text-white/70 hover:text-white' aria-label='모달 닫기'>×</button>
         </div>
 
-        <div className='mt-6 grid gap-4 sm:grid-cols-2'>
+        <div className='mt-6 grid gap-4 sm:grid-cols-3'>
           <label className='text-sm'>활동
             <select value={activityType} onChange={(event) => setActivityType(event.target.value)} className='mt-2 w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-white'>
               {ACTIVITY_OPTIONS.map((option) => <option key={option.value} value={option.value} className='bg-[#191c20]'>{option.label}</option>)}
@@ -319,6 +314,35 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
           <label className='text-sm'>기수
             <input type='number' min='1' value={generation} onChange={(event) => setGeneration(event.target.value)} className='mt-2 w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-white' />
           </label>
+          {/*
+            type='password'를 쓰면 로그인 폼이 아니어도 Chrome이 비밀번호 저장을 제안한다.
+            운영진끼리 공유하는 값이라 브라우저 자격증명으로 저장될 이유가 없어,
+            텍스트 입력에 -webkit-text-security로 가리고 보기 토글을 붙였다.
+            값이 있을 때만 가려서 placeholder는 그대로 읽히게 한다.
+          */}
+          <label className='text-sm'>운영진 암호
+            <div className='relative mt-2'>
+              <input
+                type='text'
+                value={passphrase}
+                onChange={(event) => changePassphrase(event.target.value)}
+                placeholder='운영진끼리 공유한 암호'
+                name='content-write-key'
+                autoComplete='off'
+                autoCorrect='off'
+                autoCapitalize='off'
+                spellCheck='false'
+                data-lpignore='true'
+                data-1p-ignore=''
+                data-form-type='other'
+                className={`w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 pr-16 text-white placeholder:text-white/40 ${!showPassphrase && passphrase ? '[-webkit-text-security:disc]' : ''}`}
+              />
+              <button type='button' onClick={() => setShowPassphrase((current) => !current)} className='absolute inset-y-0 right-2 my-auto h-7 rounded px-2 text-xs text-white/60 transition hover:bg-white/10 hover:text-white'>
+                {showPassphrase ? '숨기기' : '보기'}
+              </button>
+            </div>
+            {hasHangul && <p className='mt-2 text-orange-200'>암호에 한글이 섞여 있습니다. 한/영 키를 확인해 주세요.</p>}
+          </label>
         </div>
 
         {movedTarget && <p className='mt-3 text-sm text-orange-200'>활동이나 기수를 바꾸면 원래 매거진은 그대로 남고, 새 매거진으로 등록됩니다.</p>}
@@ -326,36 +350,6 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
         <label className='mt-4 block text-sm'>제목
           <input value={title} onChange={(event) => setTitle(event.target.value)} placeholder='매거진 제목' className='mt-2 w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 text-white placeholder:text-white/40' />
         </label>
-
-        {/*
-          type='password'를 쓰면 로그인 폼이 아니어도 Chrome이 비밀번호 저장을 제안한다.
-          운영진끼리 공유하는 값이라 브라우저 자격증명으로 저장될 이유가 없어,
-          텍스트 입력에 -webkit-text-security로 가리고 보기 토글을 붙였다.
-          값이 있을 때만 가려서 placeholder는 그대로 읽히게 한다.
-        */}
-        <label className='mt-4 block text-sm'>운영진 암호
-          <div className='relative mt-2'>
-            <input
-              type='text'
-              value={passphrase}
-              onChange={(event) => changePassphrase(event.target.value)}
-              placeholder='운영진끼리 공유한 암호'
-              name='content-write-key'
-              autoComplete='off'
-              autoCorrect='off'
-              autoCapitalize='off'
-              spellCheck='false'
-              data-lpignore='true'
-              data-1p-ignore=''
-              data-form-type='other'
-              className={`w-full rounded-lg border border-white/25 bg-white/10 px-3 py-2 pr-16 text-white placeholder:text-white/40 ${!showPassphrase && passphrase ? '[-webkit-text-security:disc]' : ''}`}
-            />
-            <button type='button' onClick={() => setShowPassphrase((current) => !current)} className='absolute inset-y-0 right-2 my-auto h-7 rounded px-2 text-xs text-white/60 transition hover:bg-white/10 hover:text-white'>
-              {showPassphrase ? '숨기기' : '보기'}
-            </button>
-          </div>
-        </label>
-        {hasHangul && <p className='mt-2 text-sm text-orange-200'>암호에 한글이 섞여 있습니다. 한/영 키를 확인해 주세요.</p>}
 
         <p className='mt-6 text-sm text-white/55'>
           ⠿ 손잡이를 끌어 옮깁니다. 블록 <span className='text-white/80'>옆</span>에 놓으면 같은 줄에 나란히, 줄 <span className='text-white/80'>사이</span>에 놓으면 새 줄이 됩니다.
