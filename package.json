@@ -8,6 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "optimize:images": "node scripts/optimize-images.mjs",
+    "images:card-variants": "node scripts/generate-card-variants.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
