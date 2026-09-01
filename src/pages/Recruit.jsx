@@ -19,16 +19,22 @@ import { loadFonts } from '../utils/fonts'
 const DESIGN_WIDTH = 1728
 const DESIGN_HEIGHT = 3200
 
+// 이 페이지는 문구 상당수가 이미지 안에 그려져 있다(README 12절). 그래서 alt을 비워
+// 두면 스크린리더와 검색엔진 입장에서는 페이지 내용이 통째로 없는 것과 같아진다.
+// 이미지에 적힌 글자를 그대로 옮겨 적어 둔다. 이미지를 바꾸면 alt도 함께 고쳐야 한다.
+
+// 파트 카드는 카드 전체가 링크라 alt이 곧 링크 이름이 된다. 비어 있으면 스크린리더가
+// "링크"라고만 읽으므로, 이미지의 글자에 어디로 가는지까지 덧붙인다.
 const partCards = [
-  { id: 'design', image: designBox, width: 410, height: 199, href: '/curriculum/design' },
-  { id: 'frontend', image: frontendBox, width: 410, height: 199, href: '/curriculum/frontend' },
-  { id: 'backend', image: backendBox, width: 410, height: 199, href: '/curriculum/backend' },
+  { id: 'design', image: designBox, width: 410, height: 199, href: '/curriculum/design', alt: 'UXUI DESIGNER 파트 커리큘럼 보기' },
+  { id: 'frontend', image: frontendBox, width: 410, height: 199, href: '/curriculum/frontend', alt: 'FRONTEND DEVELOPER 파트 커리큘럼 보기' },
+  { id: 'backend', image: backendBox, width: 410, height: 199, href: '/curriculum/backend', alt: 'BACKEND DEVELOPER 파트 커리큘럼 보기' },
 ]
 
 const targetCards = [
-  { id: 'passion', image: passionCard, width: 410, height: 380 },
-  { id: 'cowork', image: coworkCard, width: 410, height: 380 },
-  { id: 'response', image: responseCard, width: 410, height: 380 },
+  { id: 'passion', image: passionCard, width: 410, height: 380, alt: '열정. 새로운 지식과 프로젝트에 끊임없이 도전하는 열정과 탐구심을 가진 분을 원해요.' },
+  { id: 'cowork', image: coworkCard, width: 410, height: 380, alt: '협업. 팀원들과의 소통을 중요하게 여기고, 서로의 의견을 존중하며 함께 성장하고자 하는 분을 원해요.' },
+  { id: 'response', image: responseCard, width: 410, height: 380, alt: '책임. 매주 정기 세션과 필수 활동에 1년간 꾸준히 참여하며 책임감을 가지고 임할 수 있는 분을 원해요.' },
 ]
 
 const scheduleItems = [
@@ -160,7 +166,7 @@ export default function Recruit() {
                   href={part.href}
                   className='group relative mx-auto block w-full max-w-[660px] overflow-hidden rounded-2xl transition-transform hover:-translate-y-0.5'
                 >
-                  <img src={part.image} alt='' width={part.width} height={part.height} loading='lazy' decoding='async' className='block h-auto w-full object-contain' />
+                  <img src={part.image} alt={part.alt} width={part.width} height={part.height} loading='lazy' decoding='async' className='block h-auto w-full object-contain' />
                 </a>
               ))}
             </div>
@@ -170,7 +176,7 @@ export default function Recruit() {
             <h2 className='text-center text-[38px] font-medium'>모집 대상</h2>
             <div className='mx-auto mt-12 grid max-w-[1280px] grid-cols-1 gap-5 md:grid-cols-3'>
               {targetCards.map((item) => (
-                <img key={item.id} src={item.image} alt='' width={item.width} height={item.height} loading='lazy' decoding='async' className='mx-auto h-auto w-full max-w-[660px] object-contain' />
+                <img key={item.id} src={item.image} alt={item.alt} width={item.width} height={item.height} loading='lazy' decoding='async' className='mx-auto h-auto w-full max-w-[660px] object-contain' />
               ))}
             </div>
           </section>
