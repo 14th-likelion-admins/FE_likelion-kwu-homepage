@@ -70,13 +70,19 @@ export default function Home() {
       })
     }, observerOptions)
 
-    if (aboutRef.current) aboutObserver.observe(aboutRef.current)
-    if (coreValuesRef.current) coreValuesObserver.observe(coreValuesRef.current)
+    // 정리 함수에서 ref.current를 다시 읽으면 안 된다. 언마운트 시점에는 React가
+    // 이미 null로 되돌린 뒤라 unobserve가 조용히 건너뛰어진다. 관찰을 시작한 그
+    // 요소를 지역 변수로 붙잡아 두고 정리할 때도 같은 것을 쓴다.
+    const aboutSection = aboutRef.current
+    const coreValuesSection = coreValuesRef.current
+
+    if (aboutSection) aboutObserver.observe(aboutSection)
+    if (coreValuesSection) coreValuesObserver.observe(coreValuesSection)
 
     return () => {
       clearTimeout(timer)
-      if (aboutRef.current) aboutObserver.unobserve(aboutRef.current)
-      if (coreValuesRef.current) coreValuesObserver.unobserve(coreValuesRef.current)
+      if (aboutSection) aboutObserver.unobserve(aboutSection)
+      if (coreValuesSection) coreValuesObserver.unobserve(coreValuesSection)
     }
   }, [])
 
