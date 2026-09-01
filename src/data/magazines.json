@@ -4,7 +4,7 @@
       "title": "80개 대학 모인 ‘애니멀 리그’, 광운대 사자들의 중앙해커톤 로그",
       "blocks": [
         {
-          "id": "c021e3d5-bc30-4bbe-82ff-e4b9d9c948eb",
+          "id": "f20ac55b-4856-418b-bd2d-3e5b50249e81",
           "type": "row",
           "items": [
             {
@@ -25,7 +25,7 @@
           ]
         },
         {
-          "id": "7e927f21-1847-4910-9481-9ea7b90e33e8",
+          "id": "c021e3d5-bc30-4bbe-82ff-e4b9d9c948eb",
           "type": "row",
           "items": [
             {
@@ -33,22 +33,16 @@
               "type": "image",
               "url": "/uploads/magazines/efd043ba-e707-4907-a3c1-f17f1cfd1af3.webp",
               "caption": "1팀(그대는그뭐냐그거다) - HEY",
-              "width": "full",
+              "width": "half",
               "pixelWidth": 1200,
               "pixelHeight": 800
-            }
-          ]
-        },
-        {
-          "id": "6d019c63-24eb-4832-8d58-5f5b6b7a42a6",
-          "type": "row",
-          "items": [
+            },
             {
               "id": "046383c1-aa0a-41d9-90e2-8edc312b536c",
               "type": "image",
               "url": "/uploads/magazines/158eedc1-8a16-4642-8cd9-3a0ce972382f.webp",
               "caption": "2팀(갓생사자) - Filaby",
-              "width": "full",
+              "width": "half",
               "pixelWidth": 1600,
               "pixelHeight": 1067
             }
@@ -63,22 +57,16 @@
               "type": "image",
               "url": "/uploads/magazines/7deb54e2-3f7e-46b4-835e-b05b1d398408.webp",
               "caption": "3팀(북부대공예티) - BATO",
-              "width": "full",
+              "width": "half",
               "pixelWidth": 1600,
               "pixelHeight": 900
-            }
-          ]
-        },
-        {
-          "id": "58dc5d1d-aa20-4bb0-a793-7d7b2e522a7b",
-          "type": "row",
-          "items": [
+            },
             {
               "id": "d86815c7-ec78-497b-be65-7a1c31ff50b5",
               "type": "image",
               "url": "/uploads/magazines/9fa5a890-8a80-441d-95e8-7408f6727f33.webp",
               "caption": "4팀(아크크) - MODI",
-              "width": "full",
+              "width": "half",
               "pixelWidth": 1600,
               "pixelHeight": 903
             }
