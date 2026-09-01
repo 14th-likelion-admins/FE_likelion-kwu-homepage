@@ -1,6 +1,7 @@
 import { Fragment, useState } from 'react'
 import { DndContext, PointerSensor, closestCenter, useDraggable, useDroppable, useSensor, useSensors } from '@dnd-kit/core'
 import { deleteMagazine, saveMagazine, uploadImage } from '../api/magazineApi'
+import { usePageScrollLock } from '../hooks/usePageScrollLock'
 import {
   MAX_COLUMNS,
   appendItemToRow,
@@ -136,6 +137,9 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
   const [deleting, setDeleting] = useState(false)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
   const [error, setError] = useState('')
+
+  // 모달이 떠 있는 동안 뒤 페이지는 잠그고, 스크롤은 아래 패널 안에서만 일어나게 한다.
+  usePageScrollLock()
 
   // 카드 안에 입력 요소가 많아서, 살짝 끌어야 드래그로 인식하도록 문턱을 둔다.
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }))
@@ -299,7 +303,8 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
 
   return (
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4' role='dialog' aria-modal='true' aria-labelledby='magazine-editor-title'>
-      <div className='max-h-[90vh] w-full max-w-5xl overflow-y-auto rounded-2xl border border-white/20 bg-[#191c20] p-5 text-white shadow-2xl md:p-8'>
+      {/* data-lenis-prevent: Lenis가 이 안의 wheel을 가로채지 않아야 패널이 스스로 스크롤된다. usePageScrollLock 주석 참고. */}
+      <div data-lenis-prevent className='max-h-[90vh] w-full max-w-5xl overflow-y-auto overscroll-contain rounded-2xl border border-white/20 bg-[#191c20] p-5 text-white shadow-2xl md:p-8'>
         <div className='flex items-center justify-between gap-4'>
           <h2 id='magazine-editor-title' className='text-xl font-semibold md:text-2xl'>{isEditing ? '매거진 수정' : '매거진 등록'}</h2>
           <button type='button' onClick={onClose} className='text-2xl text-white/70 hover:text-white' aria-label='모달 닫기'>×</button>
