@@ -10,8 +10,17 @@
             {
               "id": "1801477e-39d0-4c6b-a19c-0b5e55b25a80",
               "type": "text",
-              "text": "# (작성 중)\n\n본문",
+              "text": "# (작성 중)",
               "style": "paragraph"
+            },
+            {
+              "id": "2e5613e9-42a2-4c9a-8c72-4aa01cdecc8c",
+              "type": "image",
+              "url": "/uploads/magazines/43693388-de0a-4eda-a3a4-00c074177307.webp",
+              "caption": "",
+              "width": "full",
+              "pixelWidth": 1414,
+              "pixelHeight": 1112
             }
           ]
         }
