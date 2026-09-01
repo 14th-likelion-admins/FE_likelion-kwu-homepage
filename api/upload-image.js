@@ -40,6 +40,11 @@ function multipartParts(body, contentType) {
   return parts;
 }
 
+// 이 줄은 Next.js API Route 형식이라 Vercel의 Node 런타임은 읽지 않는다. 즉 아무
+// 효과가 없다. 이 핸들러가 multipart를 다룰 수 있는 이유는 설정이 아니라
+// readRequestBuffer가 요청 스트림을 직접 읽기 때문이다(request.body를 건드리지 않는다).
+// 지우는 편이 깔끔하지만, 업로드는 프리뷰에서 검증할 수 없어(README 9.2절) 실제
+// 확인 없이 손대지 않는다. 이 설정에 의존한다고 오해하지 말 것.
 export const config = { api: { bodyParser: false } };
 
 export default async function handler(request, response) {
