@@ -17,9 +17,9 @@ import {
 } from '../utils/magazineBlocks'
 
 const ACTIVITY_OPTIONS = [
-  { value: 'OT', label: 'OT' },
   { value: 'IDEATHON', label: '아이디어톤' },
-  { value: 'HACKATHON', label: '해커톤' },
+  { value: 'HACKATHON', label: '중앙 해커톤' },
+  { value: 'UNION_HACKATHON', label: '권역별 연합해커톤' },
 ]
 
 /** 행 사이 여백. 여기에 떨어뜨리면 그 위치에 새 줄이 생긴다. */

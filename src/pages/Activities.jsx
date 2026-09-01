@@ -17,12 +17,12 @@ import { CURRENT_GENERATION, GENERATIONS } from '../data/generations'
 // 에디터는 운영진만 열고 드래그 라이브러리까지 딸려 오므로, 방문자 번들에서 떼어낸다.
 const MagazineEditorModal = lazy(() => import('../components/MagazineEditorModal'))
 
-const ACTIVITY_TYPES = { ot: 'OT', ideathon: 'IDEATHON', hackathon: 'HACKATHON' }
+const ACTIVITY_TYPES = { ideathon: 'IDEATHON', hackathon: 'HACKATHON', unionHackathon: 'UNION_HACKATHON' }
 const activityCards = [
-  { id: 'ot', title: 'OT', description: '멋쟁이사자처럼으로\n함께하는 첫 걸음!', image: cardOt, width: 270, height: 271 },
-  { id: 'ideathon', title: '아이디어톤', description: '5주간 특정 주제에 맞춰,\n무한한 아이디어를 나누는 행사입니다.', image: cardIdeathon, width: 268, height: 268 },
-  { id: 'hackathon', title: '해커톤', description: '8주간 멋쟁이사자처럼과 함께\n진행하는 대규모 무박 2일 해커톤 행사', image: cardHackathon, width: 266, height: 266 },
-  { id: 'project', title: '프로젝트', description: '기획부터 구현까지\n작업 과정을 배우는 중요한 활동', image: cardProject, width: 310, height: 310 },
+  { id: 'project', title: '프로젝트', description: '기획부터 구현까지\n작업 과정을 배우는 중요한 활동', image: cardOt, width: 270, height: 271 },
+  { id: 'ideathon', title: '아이디어톤', description: '3주간 특정 주제에 맞춰,\n무한한 아이디어를 나누는 행사입니다.', image: cardIdeathon, width: 268, height: 268 },
+  { id: 'hackathon', title: '중앙 해커톤', description: '3주간 멋쟁이사자처럼과 함께\n진행하는 대규모 무박 2일 해커톤 행사', image: cardHackathon, width: 266, height: 266 },
+  { id: 'unionHackathon', title: '권역별 연합해커톤', description: '서울 권역의 다양한 대학의 멋사와\n교류하며 성장할 수 있는 해커톤 행사', image: cardProject, width: 310, height: 310 },
 ]
 
 function MagazineItem({ item }) {
