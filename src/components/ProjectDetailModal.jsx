@@ -12,49 +12,23 @@
  *   onClose={() => setIsModalOpen(false)}
  * />
  *
- * 수정 사항:
- * - return null 이전에 스크롤 복원을 처리하도록 변경
- * - removeProperty 사용으로 스타일 완전 제거
- * - 별도의 useEffect로 스크롤 관리 분리
+ * 배경 스크롤 잠금은 hooks/usePageScrollLock에 모아 두었다. 등록 폼 모달들과 같은
+ * 문제를 같은 방식으로 처리하고, 풀 때 Lenis 내부 위치까지 맞추기 위해서다.
  *
  * ============================================================================
  */
 
 import { useEffect, useRef } from 'react'
 import ImageCarousel from './ImageCarousel'
+import { usePageScrollLock } from '../hooks/usePageScrollLock'
 
 export const ProjectDetailModal = ({ project, isOpen, onClose }) => {
   const modalRef = useRef(null)
-  const scrollPositionRef = useRef(0)
   const didPushModalHistoryRef = useRef(false)
   const closedByPopStateRef = useRef(false)
 
-  // 스크롤 관리 - isOpen 변경 시마다 실행
-  useEffect(() => {
-    if (isOpen) {
-      // 모달 열릴 때
-      scrollPositionRef.current = window.scrollY
-      document.body.style.overflow = 'hidden'
-      document.body.style.position = 'fixed'
-      document.body.style.top = `-${scrollPositionRef.current}px`
-      document.body.style.width = '100%'
-    } else {
-      // 모달 닫힐 때
-      document.body.style.removeProperty('overflow')
-      document.body.style.removeProperty('position')
-      document.body.style.removeProperty('top')
-      document.body.style.removeProperty('width')
-      window.scrollTo(0, scrollPositionRef.current)
-    }
-
-    // cleanup - 컴포넌트 unmount 시
-    return () => {
-      document.body.style.removeProperty('overflow')
-      document.body.style.removeProperty('position')
-      document.body.style.removeProperty('top')
-      document.body.style.removeProperty('width')
-    }
-  }, [isOpen])
+  // 모달이 떠 있는 동안 뒤 페이지는 잠그고, 스크롤은 본문 영역 안에서만 일어나게 한다.
+  usePageScrollLock(isOpen)
 
   // 모달 외부 클릭 시 닫기
   useEffect(() => {
@@ -154,8 +128,10 @@ export const ProjectDetailModal = ({ project, isOpen, onClose }) => {
           onClick={(e) => e.stopPropagation()}
         >
           {/* 스크롤 가능한 컨텐츠 영역 */}
+          {/* data-lenis-prevent: Lenis가 이 안의 wheel을 가로채지 않아야 본문이 스스로 스크롤된다. hooks/usePageScrollLock 주석 참고. */}
           <div
-            className='overflow-y-auto flex-1 [&::-webkit-scrollbar]:hidden'
+            data-lenis-prevent
+            className='overflow-y-auto overscroll-contain flex-1 [&::-webkit-scrollbar]:hidden'
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
@@ -178,15 +154,14 @@ export const ProjectDetailModal = ({ project, isOpen, onClose }) => {
                 type='button'
                 onClick={onClose}
                 aria-label='닫기'
-                className='absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/35 text-white md:hidden'
+                className='absolute right-3 top-3 z-10 rounded-full bg-black/40 px-3 py-1.5 lowercase tracking-wide text-white/70 backdrop-blur-sm transition hover:text-white'
                 style={{
-                  fontFamily: "'Inter', sans-serif",
-                  fontSize: '22px',
-                  fontWeight: 200,
+                  fontFamily: "'Space Grotesk', sans-serif",
+                  fontSize: '13px',
                   lineHeight: 1,
                 }}
               >
-                x
+                close
               </button>
               {displayProject && (
                 <ImageCarousel
