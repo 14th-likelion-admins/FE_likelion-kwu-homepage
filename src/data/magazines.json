@@ -17,10 +17,70 @@
               "id": "2e5613e9-42a2-4c9a-8c72-4aa01cdecc8c",
               "type": "image",
               "url": "/uploads/magazines/c5618445-f3c8-4b89-9a6a-3155573ebe63.webp",
-              "caption": "",
+              "caption": "광운대 멋사 단체사진",
               "width": "full",
               "pixelWidth": 1080,
               "pixelHeight": 1350
+            }
+          ]
+        },
+        {
+          "id": "7e927f21-1847-4910-9481-9ea7b90e33e8",
+          "type": "row",
+          "items": [
+            {
+              "id": "42a47843-55b5-44c6-8887-96799a62eb5b",
+              "type": "image",
+              "url": "/uploads/magazines/efd043ba-e707-4907-a3c1-f17f1cfd1af3.webp",
+              "caption": "1팀(그대는그뭐냐그거다) - HEY",
+              "width": "full",
+              "pixelWidth": 1200,
+              "pixelHeight": 800
+            }
+          ]
+        },
+        {
+          "id": "6d019c63-24eb-4832-8d58-5f5b6b7a42a6",
+          "type": "row",
+          "items": [
+            {
+              "id": "046383c1-aa0a-41d9-90e2-8edc312b536c",
+              "type": "image",
+              "url": "/uploads/magazines/158eedc1-8a16-4642-8cd9-3a0ce972382f.webp",
+              "caption": "2팀(갓생사자) - Filaby",
+              "width": "full",
+              "pixelWidth": 1600,
+              "pixelHeight": 1067
+            }
+          ]
+        },
+        {
+          "id": "fefb609d-20b6-4e76-b1e7-4835d0ed5f0f",
+          "type": "row",
+          "items": [
+            {
+              "id": "3e6d6db8-9298-4719-a1b4-5eb98038881c",
+              "type": "image",
+              "url": "/uploads/magazines/7deb54e2-3f7e-46b4-835e-b05b1d398408.webp",
+              "caption": "3팀(북부대공예티) - BATO",
+              "width": "full",
+              "pixelWidth": 1600,
+              "pixelHeight": 900
+            }
+          ]
+        },
+        {
+          "id": "58dc5d1d-aa20-4bb0-a793-7d7b2e522a7b",
+          "type": "row",
+          "items": [
+            {
+              "id": "d86815c7-ec78-497b-be65-7a1c31ff50b5",
+              "type": "image",
+              "url": "/uploads/magazines/9fa5a890-8a80-441d-95e8-7408f6727f33.webp",
+              "caption": "4팀(아크크) - MODI",
+              "width": "full",
+              "pixelWidth": 1600,
+              "pixelHeight": 903
             }
           ]
         }
