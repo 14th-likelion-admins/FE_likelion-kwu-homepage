@@ -12,11 +12,11 @@ import cardIdeathon from '../assets/activities/활동소개아이콘4.webp'
 import { loadFonts } from '../utils/fonts'
 import { toRows } from '../utils/magazineBlocks'
 import { renderInline, renderMarkdown } from '../utils/markdown'
+import { CURRENT_GENERATION, GENERATIONS } from '../data/generations'
 
 // 에디터는 운영진만 열고 드래그 라이브러리까지 딸려 오므로, 방문자 번들에서 떼어낸다.
 const MagazineEditorModal = lazy(() => import('../components/MagazineEditorModal'))
 
-const GENERATIONS = [14, 13]
 const ACTIVITY_TYPES = { ot: 'OT', ideathon: 'IDEATHON', hackathon: 'HACKATHON' }
 const activityCards = [
   { id: 'ot', title: 'OT', description: '멋쟁이사자처럼으로\n함께하는 첫 걸음!', image: cardOt, width: 270, height: 271 },
@@ -76,7 +76,7 @@ function MagazineContent({ magazine }) {
 export default function Activities() {
   const navigate = useNavigate()
   const [selectedActivity, setSelectedActivity] = useState('hackathon')
-  const [selectedGeneration, setSelectedGeneration] = useState(14)
+  const [selectedGeneration, setSelectedGeneration] = useState(CURRENT_GENERATION)
   // null이면 닫힘, 'create'는 새 매거진, 'edit'은 현재 보고 있는 매거진 수정.
   const [editorMode, setEditorMode] = useState(null)
   const [savedNotice, setSavedNotice] = useState('')
@@ -91,7 +91,7 @@ export default function Activities() {
 
   const selectCard = (cardId) => {
     if (cardId === 'project') { navigate('/projects'); return }
-    setSelectedActivity(cardId); setSelectedGeneration(14)
+    setSelectedActivity(cardId); setSelectedGeneration(CURRENT_GENERATION)
   }
   const selectGeneration = (generation) => {
     setSelectedGeneration(generation)

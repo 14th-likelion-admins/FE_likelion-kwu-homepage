@@ -4,6 +4,7 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import recruitNoise from '../assets/recruit/noise-texture-recruit-tile.webp'
 import { curriculumData, trackTabs } from '../data/curriculumData'
+import { CURRENT_GENERATION } from '../data/generations'
 import { loadFonts } from '../utils/fonts'
 
 export default function Curriculum() {
@@ -97,7 +98,7 @@ export default function Curriculum() {
           ‹
         </button>
 
-        <p className='text-center text-lg font-medium md:text-3xl'>광운대 멋쟁이사자처럼 14기 커리큘럼을 소개합니다</p>
+        <p className='text-center text-lg font-medium md:text-3xl'>광운대 멋쟁이사자처럼 {CURRENT_GENERATION}기 커리큘럼을 소개합니다</p>
 
         <div className='mt-10 flex w-full flex-nowrap items-center justify-center gap-2 md:mt-14 md:gap-6'>
           {trackTabs.map((tab) => {
