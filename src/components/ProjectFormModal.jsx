@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { registerProject, uploadImage } from '../api/projectApi'
+import { GENERATION_LABELS } from '../data/generations'
 
 const TAG_OPTIONS = ['WEB', 'APP']
-const GENERATION_OPTIONS = ['14TH', '13TH']
+// 기수 표기는 손으로 적지 않는다. 정적 프로젝트와 표기가 어긋나면 필터가 갈라진다.
+const GENERATION_OPTIONS = GENERATION_LABELS
 const ACTIVITY_OPTIONS = ['아이디어톤', '중앙해커톤', '권역별 연합해커톤']
 const MAX_IMAGES = 10
 
