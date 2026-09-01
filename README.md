@@ -1045,9 +1045,6 @@ main 직접 푸시는 피합니다.
 - `Header` / `Footer` 를 매 페이지가 직접 넣습니다. 레이아웃 컴포넌트로 묶으면
   헤더 높이 여백 중복도 함께 사라집니다.
 - 등록 프로젝트에는 수정·삭제 UI가 없습니다. 지금은 JSON을 직접 고쳐야 합니다.
-- `Home.jsx`에 `react-hooks/exhaustive-deps` 경고 2개가 남아 있습니다(78·79행).
-  `IntersectionObserver` 정리 함수가 `ref.current`를 직접 읽는 흔한 패턴이라
-  실동작에 문제는 없지만, `pnpm lint` 출력이 항상 깨끗하지 않다는 뜻입니다.
 - 매거진을 지워도 `public/uploads/` 의 사진이 남습니다. 참조 없는 파일을 찾아
   정리하는 스크립트가 있으면 좋겠습니다.
 - 테스트가 하나도 없습니다. 최소한 `utils/magazineBlocks.js` 같은 순수 함수에는
@@ -1060,12 +1057,6 @@ main 직접 푸시는 피합니다.
 - 등록이 잦아지면 커밋 수가 빠르게 늘어납니다. 지금 규모에서는 문제가 아닙니다.
 - `Recruit.jsx`의 문구 상당수가 이미지에 박혀 있어 텍스트만 고칠 수 없습니다.
   검색 엔진에도 안 잡힙니다.
-- `api/upload-image.js`에 `export const config = { api: { bodyParser: false } }`
-  가 있는데 이는 Next.js API Route 형식이라 Vercel의 Node 런타임은 읽지 않습니다.
-  즉 아무 효과가 없습니다. 핸들러가 multipart를 다룰 수 있는 이유는 이 설정이
-  아니라 `readRequestBuffer`가 요청 스트림을 직접 읽기 때문입니다. **지우는 편이
-  깔끔하지만 업로드는 프리뷰에서 검증할 수 없어(9.2절) 실제 확인 없이 손대지
-  않았습니다.** 파일에도 같은 취지의 주석을 달아 두었습니다.
 
 ---
 
