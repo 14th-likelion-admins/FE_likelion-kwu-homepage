@@ -19,6 +19,7 @@ import Header from '../components/Header'
 import Footer from '../components/Footer'
 import ProjectDetailModal from '../components/ProjectDetailModal'
 import ProjectFormModal from '../components/ProjectFormModal'
+import { smoothScrollTo } from '../utils/smoothScroll'
 import useProjects from '../hooks/useProjects'
 import heroBanner960 from '../assets/projects-hero-banner-960w.webp'
 import heroBanner1600 from '../assets/projects-hero-banner-1600w.webp'
@@ -40,9 +41,11 @@ const CARD_IMAGE_SIZES =
 // 최소 높이를 주고, 잘릴 때는 문구가 있는 왼쪽을 남긴다.
 const HERO_ASPECT = '11511 / 2447'
 
+// 한 번에 그리는 카드 수. 무한 스크롤이 이 단위로 늘린다.
+const PAGE_SIZE = 12
+
 export default function Projects() {
   const [selectedGeneration, setSelectedGeneration] = useState('전체')
-  const [displayedProjects, setDisplayedProjects] = useState(12) // 초기 표시 개수
   const [isLoading, setIsLoading] = useState(false)
   const observerTarget = useRef(null)
   const [selectedProject, setSelectedProject] = useState(null)
@@ -54,6 +57,15 @@ export default function Projects() {
 
   // 프로젝트 데이터 (정적 17개 + 등록된 프로젝트 병합)
   const { allProjects, addProject } = useProjects()
+
+  // 표시 개수. ?id=로 지목된 프로젝트가 첫 화면 밖에 있으면 그 지점까지 펼친 채 시작한다.
+  // 렌더 뒤에 이펙트로 늘리면 요소가 없는 채로 스크롤을 시도했다가 한 박자 늦게 다시
+  // 그려지므로, 처음부터 필요한 만큼 잡아 두는 편이 단순하다.
+  const [displayedProjects, setDisplayedProjects] = useState(() => {
+    if (!projectIdParam) return PAGE_SIZE
+    const index = allProjects.findIndex((project) => String(project.id) === projectIdParam)
+    return index < 0 ? PAGE_SIZE : Math.max(PAGE_SIZE, index + 1)
+  })
 
   // 기수 목록은 실제 프로젝트 데이터에서 동적으로 추출 (최신 기수가 먼저)
   const generations = useMemo(() => {
@@ -91,7 +103,7 @@ export default function Projects() {
     if (isLoading) return
     setIsLoading(true)
     setTimeout(() => {
-      setDisplayedProjects((prev) => Math.min(prev + 12, filteredProjects.length))
+      setDisplayedProjects((prev) => Math.min(prev + PAGE_SIZE, filteredProjects.length))
       setIsLoading(false)
     }, 500)
   }, [isLoading, filteredProjects.length])
@@ -118,27 +130,33 @@ export default function Projects() {
     }
   }, [displayedProjects, filteredProjects.length, loadMoreProjects])
 
+  // Lenis가 켜져 있으면 window.scrollTo({ behavior: 'smooth' })는 무시된다. 헬퍼를 쓴다.
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    smoothScrollTo(0)
   }
 
-  // 특정 프로젝트로 스크롤
+  // 특정 프로젝트로 스크롤 (?id=17 처럼 들어왔을 때)
+  //
+  // id를 숫자로 바꾸면 안 된다. 정적 프로젝트만 숫자 id를 쓰고, 등록 폼으로 올라온
+  // 프로젝트는 'git-1735...' 형태의 문자열이라 parseInt가 NaN을 만든다.
   useEffect(() => {
-    if (projectIdParam) {
-      const projectId = parseInt(projectIdParam, 10)
-      const projectElement = document.getElementById(`project-${projectId}`)
-      if (projectElement) {
-        setTimeout(() => {
-          projectElement.scrollIntoView({ behavior: 'smooth', block: 'start' })
-          // 하이라이트 효과
-          projectElement.style.borderColor = '#FFFFFF'
-          projectElement.style.transition = 'border-color 0.3s'
-          setTimeout(() => {
-            projectElement.style.borderColor = ''
-          }, 2000)
-        }, 100)
-      }
-    }
+    if (!projectIdParam) return undefined
+
+    const projectElement = document.getElementById(`project-${projectIdParam}`)
+    if (!projectElement) return undefined
+
+    const scrollTimer = setTimeout(() => {
+      // offset은 고정 헤더(데스크탑 52px) 아래로 카드가 숨지 않게 하는 여유분이다.
+      smoothScrollTo(projectElement, { offset: -80 })
+      // 하이라이트 효과
+      projectElement.style.borderColor = '#FFFFFF'
+      projectElement.style.transition = 'border-color 0.3s'
+      setTimeout(() => {
+        projectElement.style.borderColor = ''
+      }, 2000)
+    }, 100)
+
+    return () => clearTimeout(scrollTimer)
   }, [projectIdParam])
 
   const visibleProjects = filteredProjects.slice(0, displayedProjects)
@@ -186,7 +204,7 @@ export default function Projects() {
                       aria-pressed={isSelected}
                       onClick={() => {
                         setSelectedGeneration(gen)
-                        setDisplayedProjects(12)
+                        setDisplayedProjects(PAGE_SIZE)
                       }}
                       className={`flex-shrink-0 rounded-full px-4 py-2 md:px-5 transition-colors ${
                         isSelected
