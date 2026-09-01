@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { registerProject, uploadImage } from '../api/projectApi'
+import { usePageScrollLock } from '../hooks/usePageScrollLock'
 import { GENERATION_LABELS } from '../data/generations'
 
 const TAG_OPTIONS = ['WEB', 'APP']
@@ -81,6 +82,9 @@ export default function ProjectFormModal({ isOpen, onClose, onCreated }) {
     setSuccessMessage('')
     setIsSubmitting(false)
   }, [isOpen])
+
+  // 모달이 떠 있는 동안 뒤 페이지는 잠그고, 스크롤은 아래 폼 안에서만 일어나게 한다.
+  usePageScrollLock(isOpen)
 
   if (!isOpen) return null
 
@@ -242,13 +246,15 @@ export default function ProjectFormModal({ isOpen, onClose, onCreated }) {
             type='button'
             onClick={onClose}
             aria-label='닫기'
-            className='flex h-8 w-8 items-center justify-center rounded-full text-white/60 hover:bg-white/10 hover:text-white'
+            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            className='shrink-0 text-sm lowercase tracking-wide text-white/45 transition hover:text-white/80'
           >
-            ×
+            close
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className='flex-1 space-y-5 overflow-y-auto px-6 py-5'>
+        {/* data-lenis-prevent: Lenis가 이 안의 wheel을 가로채지 않아야 폼이 스스로 스크롤된다. usePageScrollLock 주석 참고. */}
+        <form data-lenis-prevent onSubmit={handleSubmit} className='flex-1 space-y-5 overflow-y-auto overscroll-contain px-6 py-5'>
           <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
             <div>
               <label className='mb-1 block text-sm text-white/70'>제목 *</label>

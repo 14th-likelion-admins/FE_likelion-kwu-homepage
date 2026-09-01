@@ -307,7 +307,7 @@ export default function MagazineEditorModal({ initialActivity, initialGeneration
       <div data-lenis-prevent className='max-h-[90vh] w-full max-w-5xl overflow-y-auto overscroll-contain rounded-2xl border border-white/20 bg-[#191c20] p-5 text-white shadow-2xl md:p-8'>
         <div className='flex items-center justify-between gap-4'>
           <h2 id='magazine-editor-title' className='text-xl font-semibold md:text-2xl'>{isEditing ? '매거진 수정' : '매거진 등록'}</h2>
-          <button type='button' onClick={onClose} className='text-2xl text-white/70 hover:text-white' aria-label='모달 닫기'>×</button>
+          <button type='button' onClick={onClose} style={{ fontFamily: "'Space Grotesk', sans-serif" }} className='shrink-0 text-sm lowercase tracking-wide text-white/45 transition hover:text-white/80' aria-label='모달 닫기'>close</button>
         </div>
 
         <div className='mt-6 grid gap-4 sm:grid-cols-3'>
